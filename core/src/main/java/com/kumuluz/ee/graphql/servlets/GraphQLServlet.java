@@ -116,7 +116,6 @@ public class GraphQLServlet extends HttpServlet {
             }
             return generator.generate();
         } catch(Exception e) {
-            //je potreben boljsi error handling
             LOG.severe(e.getMessage());
         }
         return null;
