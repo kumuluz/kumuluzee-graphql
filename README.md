@@ -1,1 +1,1 @@
-# kumuluzee-graphql
+# KumuluzEE GraphQL
