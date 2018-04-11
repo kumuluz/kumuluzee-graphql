@@ -1,7 +1,6 @@
 # KumuluzEE GraphQL
-<!---
+
 [![Build Status](https://img.shields.io/travis/kumuluz/kumuluzee-graphql/master.svg?style=flat)](https://travis-ci.org/kumuluz/kumuluzee-graphql)
--->
 
 > Kick-start your GraphQL server development with this powerful extension.
 
