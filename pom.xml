@@ -6,8 +6,10 @@
 
     <groupId>com.kumuluz.ee.graphql</groupId>
     <artifactId>kumuluzee-graphql-parent</artifactId>
-    <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
+
+    <packaging>pom</packaging>
+
     <modules>
         <module>core</module>
         <module>graphql-ui</module>
@@ -15,10 +17,11 @@
 
     <name>KumuluzEE GraphQL Parent</name>
 
-    <inceptionYear>2018</inceptionYear>
     <description>
         KumuluzEE GraphQL extension provides a layer around GraphQL server, that enables rapid schema development.
     </description>
+
+    <inceptionYear>2018</inceptionYear>
 
     <url>https://ee.kumuluz.com</url>
 
