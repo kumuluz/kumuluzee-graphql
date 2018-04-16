@@ -2,14 +2,14 @@
 
 [![Build Status](https://img.shields.io/travis/kumuluz/kumuluzee-graphql/master.svg?style=flat)](https://travis-ci.org/kumuluz/kumuluzee-graphql)
 
-> Kick-start your GraphQL server development with this powerful extension.
+> Kick-start your GraphQL server development.
 
-KumuluzEE GraphQL extension enables you to easily create your own GraphQL server with a few simple annotations. Using 
+KumuluzEE GraphQL project enables you to easily create your own GraphQL server with a few simple annotations. Using 
 this extension requires understanding of the basic GraphQL concepts.
 
 Read about GraphQL: [GraphQL](http://graphql.org/learn/).
 
-This extension is built upon the [GraphQL Java implementation](https://github.com/graphql-java/graphql-java) and uses [GraphQL SPQR](https://github.com/leangen/graphql-spqr) extension for building schema from annotations. 
+This project is built upon the [GraphQL Java implementation](https://github.com/graphql-java/graphql-java) and uses [GraphQL SPQR](https://github.com/leangen/graphql-spqr) extension for building schema from annotations. 
 
 ## Usage
 
