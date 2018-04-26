@@ -24,23 +24,26 @@ package com.kumuluz.ee.graphql.servlets;
 import com.kumuluz.ee.common.dependencies.EeComponentType;
 import com.kumuluz.ee.common.runtime.EeRuntime;
 import com.kumuluz.ee.common.runtime.EeRuntimeComponent;
+import com.kumuluz.ee.graphql.GraphQLApplication;
 import com.kumuluz.ee.graphql.utils.JsonKit;
 import com.kumuluz.ee.graphql.utils.QueryParameters;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
+import graphql.execution.ExecutionIdProvider;
+import graphql.execution.ExecutionStrategy;
+import graphql.execution.instrumentation.ChainedInstrumentation;
+import graphql.execution.preparsed.PreparsedDocumentProvider;
 import graphql.schema.GraphQLSchema;
 import io.leangen.graphql.GraphQLSchemaGenerator;
 
-import javax.enterprise.inject.spi.*;
+import javax.enterprise.inject.spi.Unmanaged;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -52,6 +55,14 @@ import java.util.logging.Logger;
 public class GraphQLServlet extends HttpServlet {
     private GraphQLSchema schema;
     private GraphQL graphQL;
+    private HashMap<String, Object> contexts = new HashMap<>();
+    private ChainedInstrumentation chainedInstumnetation = null;
+    private ExecutionStrategy queryExecutionStrategy = null;
+    private ExecutionStrategy mutationExecutionStrategy = null;
+    private ExecutionStrategy subscriptionExecutionStrategy = null;
+    private PreparsedDocumentProvider preparsedDocumentProvider = null;
+    private ExecutionIdProvider executionIdProvider = null;
+    private boolean perRequest = false;
     private static final Logger LOG = Logger.getLogger(GraphQLServlet.class.getName());
 
     @Override
@@ -75,21 +86,66 @@ public class GraphQLServlet extends HttpServlet {
     }
 
     private void processQuery(QueryParameters parameters, HttpServletResponse resp) throws IOException {
-        ExecutionInput.Builder executionInput = ExecutionInput.newExecutionInput()
-                .query(parameters.getQuery())
-                .operationName(parameters.getOperationName())
-                .variables(parameters.getVariables());
         if(schema == null) {
+            List<GraphQLApplication> applications = new ArrayList<>();
+            ServiceLoader.load(GraphQLApplication.class).forEach(applications::add);
+            Class applicationClass = null;
+            if(applications.size() == 1) {
+               applicationClass = applications.get(0).getClass();
+            } else if(applications.size() > 1) {
+                LOG.warning("Found multiple declaratinos of GraphQLApplication. Please only provide one.");
+            } else {
+                applicationClass = GraphQLApplication.class;
+            }
+            try {
+                GraphQLApplication app = (GraphQLApplication)applicationClass.newInstance();
+                contexts = app.setContexts();
+                chainedInstumnetation = new ChainedInstrumentation(app.setInstrumentations());
+                queryExecutionStrategy = app.setQueryExecutionStrategy();
+                mutationExecutionStrategy = app.setMutationExecutionStrategy();
+                subscriptionExecutionStrategy = app.setSubscriptionExecutionStrategy();
+                preparsedDocumentProvider = app.setPreparsedDocumentProvider();
+                executionIdProvider = app.setExecutionIdProvider();
+                perRequest = app.setPerRequestBuilder();
+            } catch (Exception e) {
+                LOG.severe(e.getMessage());
+            }
             schema = buildSchema();
         }
 
         if(graphQL == null) {
-            graphQL = GraphQL
+            GraphQL.Builder builder = GraphQL
                     .newGraphQL(schema)
-                    .build();
+                    .instrumentation(chainedInstumnetation);
+            if(queryExecutionStrategy != null) {
+                builder.queryExecutionStrategy(queryExecutionStrategy);
+            }
+            if(mutationExecutionStrategy != null) {
+                builder.mutationExecutionStrategy(mutationExecutionStrategy);
+            }
+            if(subscriptionExecutionStrategy != null) {
+                builder.subscriptionExecutionStrategy(subscriptionExecutionStrategy);
+            }
+            if(preparsedDocumentProvider != null) {
+                builder.preparsedDocumentProvider(preparsedDocumentProvider);
+            }
+            if(executionIdProvider != null) {
+                builder.executionIdProvider(executionIdProvider);
+            }
+            graphQL = builder.build();
         }
+
+        ExecutionInput.Builder executionInput = ExecutionInput.newExecutionInput()
+                .query(parameters.getQuery())
+                .operationName(parameters.getOperationName())
+                .variables(parameters.getVariables())
+                .context(contexts);
+
         ExecutionResult executionResult = graphQL.execute(executionInput.build());
         returnAsJson(resp, executionResult);
+        if(perRequest) {
+            graphQL = null;
+        }
     }
 
     private GraphQLSchema buildSchema()  {
@@ -111,7 +167,7 @@ public class GraphQLServlet extends HttpServlet {
                 } else {
                     //no CDI, use newInstance()
                     Object o = c.newInstance();
-                    generator.withOperationsFromSingleton(o);
+                    generator.withOperationsFromSingleton(o, c);
                 }
             }
             return generator.generate();

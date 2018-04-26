@@ -33,6 +33,17 @@ kumuluzee:
       mapping: /myCompanyGraphQL
 ```
 
+### Registering GraphQL application class
+For additional configutation, an application class can be created. It must extend `GraphQLApplication` and be annotated with annotation `GraphQLApplicationClass`. Inside that class configuration methods can be overridden. Currently these settings are supported:
+* custom contexts,
+* custom instrumentations,
+* custom execution strategies,
+* custom request caching with preparsed document provider,
+* custom execution id provider,
+* change endpoint to create GraphQL object per request (if you are using DataLoaders).
+
+If you are unfamiliar with these settings, you can read `graphl-java` [documentation](https://graphql-java.readthedocs.io/en/latest/index.html).
+
 ### Registering GraphQL classes 
 
 The `@GraphQLClass` annotation must be used on the classes that define GraphQL related functions. All GraphQL 
@@ -82,6 +93,9 @@ public class HelloWorld {
     }
 }
 ```
+
+### Defining GraphQL subscriptions
+Subscriptions are not supported at this time.
 
 ### Annotating GraphQL arguments
 The `@GraphQLArgument` annotation must be used for defining the arguments. It allows you to override argument's name, 

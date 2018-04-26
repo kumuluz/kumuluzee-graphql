@@ -21,6 +21,7 @@
 
 package com.kumuluz.ee.graphql.processor;
 
+import com.kumuluz.ee.graphql.annotations.GraphQLApplicationClass;
 import com.kumuluz.ee.graphql.annotations.GraphQLClass;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -52,6 +53,21 @@ public class AnnotationProcessor extends AbstractProcessor{
         if (!serviceClassNames.isEmpty()) {
             try {
                 writeServiceFile(serviceClassNames, "META-INF/kumuluzee/graphql/java.lang.Object");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Set<? extends Element> annotated = roundEnvironment.getElementsAnnotatedWith(GraphQLApplicationClass.class);
+        Set<String> settingsClassNames = new HashSet<>();
+        for (Element element : annotated) {
+            settingsClassNames.add(element.toString());
+        }
+
+        // write annotated class names to service file
+        if (!settingsClassNames.isEmpty()) {
+            try {
+                writeServiceFile(settingsClassNames, "META-INF/services/com.kumuluz.ee.graphql.GraphQLApplication");
             } catch (IOException e) {
                 e.printStackTrace();
             }
