@@ -181,9 +181,12 @@ public class GraphQLServlet extends HttpServlet {
     private Object getUnmanagedInstance(Class c) {
         Unmanaged unmanaged = new Unmanaged(c);
         Unmanaged.UnmanagedInstance unmanagedInstance = unmanaged.newInstance().produce().inject().postConstruct();
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            unmanagedInstance.preDestroy().dispose();
-        }));
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                unmanagedInstance.preDestroy().dispose();
+            }
+        });
         return unmanagedInstance.get();
     }
 

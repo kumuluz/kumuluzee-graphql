@@ -40,7 +40,7 @@ import java.util.logging.Logger;
  * @author Domen Kajdic
  * @since 1.0.0
  */
-@EeExtensionDef(name = "GraphQL", group = "GRAPH_QL")
+@EeExtensionDef(name = "GraphQL", group = "GRAPHQL")
 @EeComponentDependency(EeComponentType.SERVLET)
 public class GraphQLExtension implements Extension {
 

@@ -42,7 +42,7 @@ For additional configutation, an application class can be created. It must exten
 * custom execution id provider,
 * change endpoint to create GraphQL object per request (if you are using DataLoaders).
 
-If you are unfamiliar with these settings, you can read `graphl-java` [documentation](https://graphql-java.readthedocs.io/en/latest/index.html).
+If you are unfamiliar with these settings, you can read `graphql-java` [documentation](https://graphql-java.readthedocs.io/en/latest/index.html).
 
 ### Registering GraphQL classes 
 
