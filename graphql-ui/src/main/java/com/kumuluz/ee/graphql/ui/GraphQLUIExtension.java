@@ -38,7 +38,7 @@ import java.util.logging.Logger;
  * @author Domen Kajdic
  * @since 1.0.0
  */
-@EeExtensionDef(name = "GraphQLUI", group = "GRAPHQL")
+@EeExtensionDef(name = "GraphQLUI", group = "GRAPHQL_UI")
 public class GraphQLUIExtension implements Extension {
 
     private static final Logger LOG = Logger.getLogger(GraphQLUIExtension.class.getName());
