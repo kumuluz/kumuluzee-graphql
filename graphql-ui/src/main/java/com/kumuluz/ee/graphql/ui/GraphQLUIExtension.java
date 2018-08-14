@@ -61,12 +61,16 @@ public class GraphQLUIExtension implements Extension {
             }
 
             boolean production = configurationUtil.get("kumuluzee.env.name").orElse("dev").equals("production");
-            if(configurationUtil.getBoolean("kumuluzee.server.graphql.ui.enabled").orElse(!production)) {
+            if(configurationUtil.getBoolean("kumuluzee.graphql.ui.enabled").orElse(!production)) {
+                String mapping = configurationUtil.get("kumuluzee.graphql.ui.mapping").orElse("/graphiql");
+                if(mapping.charAt(0) != '/') {
+                    mapping = '/' + mapping;
+                }
                 JettyServletServer server = (JettyServletServer) kumuluzServerWrapper.getServer();
-                server.registerServlet(GraphQLUIServlet.class, "/graphiql");
+                server.registerServlet(GraphQLUIServlet.class, mapping);
                 LOG.info("GraphQL UI extension initialized.");
             } else {
-                LOG.info("GraphQL UI disabled. You can enable it explicitly by setting field kumuluzee.server.graphql.ui.enabled to true.");
+                LOG.info("GraphQL UI disabled. You can enable it explicitly by setting field kumuluzee.graphql.ui.enabled to true.");
             }
         }
     }

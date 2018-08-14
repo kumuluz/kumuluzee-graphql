@@ -70,7 +70,7 @@ public class GraphQLUtils<T> {
 
     private static Pagination getDefaultPagination() {
         ConfigurationUtil  configurationUtil = ConfigurationUtil.getInstance();
-        return new Pagination(configurationUtil.getInteger("kumuluzee.server.graphql.defaults.limit").orElse(20), configurationUtil.getInteger("kumuluzee.server.graphql.defaults.offset").orElse(0));
+        return new Pagination(configurationUtil.getInteger("kumuluzee.graphql.defaults.limit").orElse(20), configurationUtil.getInteger("kumuluzee.graphql.defaults.offset").orElse(0));
     }
 
     public static <T> PaginationWrapper<T> process(List<T> l, Pagination p, Sort s, Filter f) {
@@ -81,8 +81,8 @@ public class GraphQLUtils<T> {
         if(p == null) {
             p = getDefaultPagination();
         }
-        Integer offset = p.getOffset() == null ? configurationUtil.getInteger("kumuluzee.server.graphql.defaults.offset").orElse(0) : p.getOffset();
-        Integer limit = p.getLimit() == null ? offset + configurationUtil.getInteger("kumuluzee.server.graphql.defaults.limit").orElse(20) : offset + p.getLimit();
+        Integer offset = p.getOffset() == null ? configurationUtil.getInteger("kumuluzee.graphql.defaults.offset").orElse(0) : p.getOffset();
+        Integer limit = p.getLimit() == null ? offset + configurationUtil.getInteger("kumuluzee.graphql.defaults.limit").orElse(20) : offset + p.getLimit();
         int count = list.size();
         PaginationOutput output = new PaginationOutput(p, count);
         if(offset > count) {
@@ -498,8 +498,8 @@ public class GraphQLUtils<T> {
         }
 
         if(p != null) {
-            Integer offset = p.getOffset() == null ? configurationUtil.getInteger("kumuluzee.server.graphql.defaults.offset").orElse(0) : p.getOffset();
-            Integer limit = p.getLimit() == null ? offset + configurationUtil.getInteger("kumuluzee.server.graphql.defaults.limit").orElse(20) : offset + p.getLimit();
+            Integer offset = p.getOffset() == null ? configurationUtil.getInteger("kumuluzee.graphql.defaults.offset").orElse(0) : p.getOffset();
+            Integer limit = p.getLimit() == null ? offset + configurationUtil.getInteger("kumuluzee.graphql.defaults.limit").orElse(20) : offset + p.getLimit();
             qs.setOffset(offset);
             qs.setLimit(limit);
         }

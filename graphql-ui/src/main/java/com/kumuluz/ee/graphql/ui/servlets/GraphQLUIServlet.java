@@ -45,7 +45,7 @@ public class GraphQLUIServlet extends HttpServlet {
         PrintWriter w = resp.getWriter();
         if(path == null) {
             ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
-            path = configurationUtil.get("kumuluzee.server.graphql.mapping").orElse("/graphql");
+            path = configurationUtil.get("kumuluzee.graphql.mapping").orElse("/graphql");
             try {
                 URI u = new URI(path);
                 if(u.isAbsolute()) {

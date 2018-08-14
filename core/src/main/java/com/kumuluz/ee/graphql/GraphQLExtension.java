@@ -56,7 +56,7 @@ public class GraphQLExtension implements Extension {
             LOG.info("Initializing GraphQL extension.");
             ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
 
-            String path = configurationUtil.get("kumuluzee.server.graphql.mapping").orElse("/graphql");
+            String path = configurationUtil.get("kumuluzee.graphql.mapping").orElse("/graphql");
             try {
                 URI u = new URI(path);
                 if(u.isAbsolute()) {

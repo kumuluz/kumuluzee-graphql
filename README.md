@@ -28,9 +28,8 @@ When KumuluzEE GraphQL is included in the project, you can start developing your
 GraphQL server will be served on /graphql by default. You can change this with the KumuluzEE configuration framework by setting the following key:
 ```yaml
 kumuluzee:
-  server:
-    graphql:
-      mapping: /myCompanyGraphQL
+  graphql:
+    mapping: /myCompanyGraphQL
 ```
 
 ### Registering GraphQL application class
@@ -450,11 +449,10 @@ Defaults can be set in config file:
 
 ```yaml
 kumuluzee:
-  server:
-    graphql:
-      defaults:
-        offset: 0
-        limit: 20
+  graphql:
+    defaults:
+      offset: 0
+      limit: 20
 ```
 Settings default to offset 0 and limit 20.
 
@@ -542,18 +540,16 @@ If you want to include GraphiQL to your project, include the following dependenc
 </dependency>
 ```
 
-Dependency will include GraphiQL UI artifacts. If dependency is included to your project, GraphiQL will be disabled in production environment and enabled in all others.
-If you want to explicitly enable or disable it, you can do so in the configuration file:
- 
+Dependency will include GraphiQL UI artifacts. If dependency is included to your project, GraphiQL will be disabled in production environment and enabled in all others. If you want to explicitly enable or disable it, you can do so in the configuration file. After startup GraphQL UI is available at `http://localhost:8080/graphiql`(default). This setting can also be changed with key `kumuluzee.graphql.ui.mapping` in configuration.
+
 ```yaml
 kumuluzee:
-  server:
-    graphql:
-      ui:
-        enabled: true/false
+  graphql:
+    ui:
+      mapping: /myUI
+      enabled: true/false
 ```
 
-After startup GraphQL UI is available at: http://localhost:8080/graphiql.
 
 ## Changelog
 
