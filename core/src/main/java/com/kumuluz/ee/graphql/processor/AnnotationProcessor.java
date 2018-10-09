@@ -132,7 +132,7 @@ public class AnnotationProcessor extends AbstractProcessor{
             reader = resource.openReader(true);
             readOldServiceFile(serviceClassNames, reader);
             return resource;
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             // close reader, return null
         } finally {
             if (reader != null) {
