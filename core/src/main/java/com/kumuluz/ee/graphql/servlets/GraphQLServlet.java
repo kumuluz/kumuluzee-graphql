@@ -67,16 +67,15 @@ public class GraphQLServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        QueryParameters parameters = QueryParameters.from(req);
-        if (parameters.getQuery() == null) {
-            resp.setStatus(400);
-            return;
-        }
-        processQuery(parameters, resp);
+        processRequest(req, resp);
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        processRequest(req, resp);
+    }
+
+    private void processRequest(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         QueryParameters parameters = QueryParameters.from(req);
         if (parameters.getQuery() == null) {
             resp.setStatus(400);
@@ -89,11 +88,9 @@ public class GraphQLServlet extends HttpServlet {
         if(schema == null) {
             List<GraphQLApplication> applications = new ArrayList<>();
             ServiceLoader.load(GraphQLApplication.class).forEach(applications::add);
-            Class applicationClass = null;
+            Class applicationClass;
             if(applications.size() == 1) {
-               applicationClass = applications.get(0).getClass();
-            } else if(applications.size() > 1) {
-                LOG.warning("Found multiple declaratinos of GraphQLApplication. Please only provide one.");
+                applicationClass = applications.get(0).getClass();
             } else {
                 applicationClass = GraphQLApplication.class;
             }
@@ -196,7 +193,7 @@ public class GraphQLServlet extends HttpServlet {
         JsonKit.toJson(response, executionResult.toSpecification());
     }
 
-    public List<Class<?>> getResourceClasses() {
+    private List<Class<?>> getResourceClasses() {
         List<Class<?>> resourceClasses = new ArrayList<>();
 
         ClassLoader classLoader = getClass().getClassLoader();
