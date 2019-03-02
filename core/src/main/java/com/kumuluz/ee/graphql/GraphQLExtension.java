@@ -26,12 +26,16 @@ import com.kumuluz.ee.common.config.EeConfig;
 import com.kumuluz.ee.common.dependencies.EeComponentDependency;
 import com.kumuluz.ee.common.dependencies.EeComponentType;
 import com.kumuluz.ee.common.dependencies.EeExtensionDef;
+import com.kumuluz.ee.common.exceptions.KumuluzServerException;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.graphql.servlets.GraphQLServlet;
 import com.kumuluz.ee.jetty.JettyServletServer;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
 /**
@@ -47,7 +51,20 @@ public class GraphQLExtension implements Extension {
     private static final Logger LOG = Logger.getLogger(GraphQLExtension.class.getName());
 
     @Override
+    public boolean isEnabled() {
+        return ConfigurationUtil
+                .getInstance()
+                .getBoolean("kumuluzee.graphql.enabled")
+                .orElse(true);
+    }
+
+    @Override
     public void load() {
+        List<GraphQLApplication> applications = new ArrayList<>();
+        ServiceLoader.load(GraphQLApplication.class).forEach(applications::add);
+        if(applications.size() > 1) {
+            throw new KumuluzServerException("Found multiple declarations of GraphQLApplication. Please only provide one.");
+        }
     }
 
     @Override
