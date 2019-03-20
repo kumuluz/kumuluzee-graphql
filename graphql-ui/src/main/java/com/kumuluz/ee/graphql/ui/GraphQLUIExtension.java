@@ -29,7 +29,6 @@ import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.graphql.ui.servlets.GraphQLUIServlet;
 import com.kumuluz.ee.jetty.JettyServletServer;
 
-import java.net.URI;
 import java.util.logging.Logger;
 
 /**

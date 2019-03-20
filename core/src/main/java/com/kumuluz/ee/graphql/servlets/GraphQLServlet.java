@@ -37,7 +37,7 @@ import graphql.execution.preparsed.PreparsedDocumentProvider;
 import graphql.schema.GraphQLSchema;
 import io.leangen.graphql.GraphQLSchemaGenerator;
 
-import javax.enterprise.inject.spi.Unmanaged;
+import javax.enterprise.inject.spi.CDI;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -56,7 +56,7 @@ public class GraphQLServlet extends HttpServlet {
     private GraphQLSchema schema;
     private GraphQL graphQL;
     private HashMap<String, Object> contexts = new HashMap<>();
-    private ChainedInstrumentation chainedInstumnetation = null;
+    private ChainedInstrumentation chainedInstumentation = null;
     private ExecutionStrategy queryExecutionStrategy = null;
     private ExecutionStrategy mutationExecutionStrategy = null;
     private ExecutionStrategy subscriptionExecutionStrategy = null;
@@ -97,7 +97,7 @@ public class GraphQLServlet extends HttpServlet {
             try {
                 GraphQLApplication app = (GraphQLApplication)applicationClass.newInstance();
                 contexts = app.setContexts();
-                chainedInstumnetation = new ChainedInstrumentation(app.setInstrumentations());
+                chainedInstumentation = new ChainedInstrumentation(app.setInstrumentations());
                 queryExecutionStrategy = app.setQueryExecutionStrategy();
                 mutationExecutionStrategy = app.setMutationExecutionStrategy();
                 subscriptionExecutionStrategy = app.setSubscriptionExecutionStrategy();
@@ -113,7 +113,7 @@ public class GraphQLServlet extends HttpServlet {
         if(graphQL == null) {
             GraphQL.Builder builder = GraphQL
                     .newGraphQL(schema)
-                    .instrumentation(chainedInstumnetation);
+                    .instrumentation(chainedInstumentation);
             if(queryExecutionStrategy != null) {
                 builder.queryExecutionStrategy(queryExecutionStrategy);
             }
@@ -145,6 +145,7 @@ public class GraphQLServlet extends HttpServlet {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private GraphQLSchema buildSchema()  {
         try {
             List<EeRuntimeComponent> components = EeRuntime.getInstance().getEeComponents();
@@ -160,11 +161,14 @@ public class GraphQLServlet extends HttpServlet {
             for(Class c: classes) {
                 if(CDIfound) {
                     //we have CDI, perform injections
-                    generator.withOperationsFromSingleton(getUnmanagedInstance(c), c);
+                    try {
+                        generator.withOperationsFromSingleton(CDI.current().select(c).get(), c);
+                    } catch (Exception e) {
+                        generator.withOperationsFromSingleton(c.getDeclaredConstructor().newInstance());
+                    }
                 } else {
                     //no CDI, use newInstance()
-                    Object o = c.newInstance();
-                    generator.withOperationsFromSingleton(o, c);
+                    generator.withOperationsFromSingleton(c.getDeclaredConstructor().newInstance(), c);
                 }
             }
             return generator.generate();
@@ -172,19 +176,6 @@ public class GraphQLServlet extends HttpServlet {
             LOG.severe(e.getMessage());
         }
         return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    private Object getUnmanagedInstance(Class c) {
-        Unmanaged unmanaged = new Unmanaged(c);
-        Unmanaged.UnmanagedInstance unmanagedInstance = unmanaged.newInstance().produce().inject().postConstruct();
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                unmanagedInstance.preDestroy().dispose();
-            }
-        });
-        return unmanagedInstance.get();
     }
 
     private void returnAsJson(HttpServletResponse response, ExecutionResult executionResult) throws IOException {

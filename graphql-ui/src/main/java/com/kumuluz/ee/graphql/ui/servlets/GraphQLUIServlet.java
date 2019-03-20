@@ -22,7 +22,6 @@
 package com.kumuluz.ee.graphql.ui.servlets;
 
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
-import com.kumuluz.ee.graphql.ui.GraphQLUIExtension;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
