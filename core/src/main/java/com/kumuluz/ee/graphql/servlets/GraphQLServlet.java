@@ -37,7 +37,7 @@ import graphql.execution.preparsed.PreparsedDocumentProvider;
 import graphql.schema.GraphQLSchema;
 import io.leangen.graphql.GraphQLSchemaGenerator;
 
-import javax.enterprise.inject.spi.Unmanaged;
+import javax.enterprise.inject.spi.CDI;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -56,7 +56,7 @@ public class GraphQLServlet extends HttpServlet {
     private GraphQLSchema schema;
     private GraphQL graphQL;
     private HashMap<String, Object> contexts = new HashMap<>();
-    private ChainedInstrumentation chainedInstumnetation = null;
+    private ChainedInstrumentation chainedInstrumentation = null;
     private ExecutionStrategy queryExecutionStrategy = null;
     private ExecutionStrategy mutationExecutionStrategy = null;
     private ExecutionStrategy subscriptionExecutionStrategy = null;
@@ -85,19 +85,19 @@ public class GraphQLServlet extends HttpServlet {
     }
 
     private void processQuery(QueryParameters parameters, HttpServletResponse resp) throws IOException {
-        if(schema == null) {
+        if (schema == null) {
             List<GraphQLApplication> applications = new ArrayList<>();
             ServiceLoader.load(GraphQLApplication.class).forEach(applications::add);
             Class applicationClass;
-            if(applications.size() == 1) {
+            if (applications.size() == 1) {
                 applicationClass = applications.get(0).getClass();
             } else {
                 applicationClass = GraphQLApplication.class;
             }
             try {
-                GraphQLApplication app = (GraphQLApplication)applicationClass.newInstance();
+                GraphQLApplication app = (GraphQLApplication) applicationClass.newInstance();
                 contexts = app.setContexts();
-                chainedInstumnetation = new ChainedInstrumentation(app.setInstrumentations());
+                chainedInstrumentation = new ChainedInstrumentation(app.setInstrumentations());
                 queryExecutionStrategy = app.setQueryExecutionStrategy();
                 mutationExecutionStrategy = app.setMutationExecutionStrategy();
                 subscriptionExecutionStrategy = app.setSubscriptionExecutionStrategy();
@@ -110,23 +110,23 @@ public class GraphQLServlet extends HttpServlet {
             schema = buildSchema();
         }
 
-        if(graphQL == null) {
+        if (graphQL == null) {
             GraphQL.Builder builder = GraphQL
                     .newGraphQL(schema)
-                    .instrumentation(chainedInstumnetation);
-            if(queryExecutionStrategy != null) {
+                    .instrumentation(chainedInstrumentation);
+            if (queryExecutionStrategy != null) {
                 builder.queryExecutionStrategy(queryExecutionStrategy);
             }
-            if(mutationExecutionStrategy != null) {
+            if (mutationExecutionStrategy != null) {
                 builder.mutationExecutionStrategy(mutationExecutionStrategy);
             }
-            if(subscriptionExecutionStrategy != null) {
+            if (subscriptionExecutionStrategy != null) {
                 builder.subscriptionExecutionStrategy(subscriptionExecutionStrategy);
             }
-            if(preparsedDocumentProvider != null) {
+            if (preparsedDocumentProvider != null) {
                 builder.preparsedDocumentProvider(preparsedDocumentProvider);
             }
-            if(executionIdProvider != null) {
+            if (executionIdProvider != null) {
                 builder.executionIdProvider(executionIdProvider);
             }
             graphQL = builder.build();
@@ -140,51 +140,41 @@ public class GraphQLServlet extends HttpServlet {
 
         ExecutionResult executionResult = graphQL.execute(executionInput.build());
         returnAsJson(resp, executionResult);
-        if(perRequest) {
+        if (perRequest) {
             graphQL = null;
         }
     }
 
-    private GraphQLSchema buildSchema()  {
+    private GraphQLSchema buildSchema() {
         try {
             List<EeRuntimeComponent> components = EeRuntime.getInstance().getEeComponents();
             boolean CDIfound = false;
-            for(EeRuntimeComponent component : components) {
-                if(component.getType() == EeComponentType.CDI) {
+            for (EeRuntimeComponent component : components) {
+                if (component.getType() == EeComponentType.CDI) {
                     CDIfound = true;
                     break;
                 }
             }
             List<Class<?>> classes = getResourceClasses();
             GraphQLSchemaGenerator generator = new GraphQLSchemaGenerator();
-            for(Class c: classes) {
-                if(CDIfound) {
+            for (Class<?> c : classes) {
+                if (CDIfound) {
                     //we have CDI, perform injections
-                    generator.withOperationsFromSingleton(getUnmanagedInstance(c), c);
+                    try {
+                        generator.withOperationsFromSingleton(CDI.current().select(c).get(), c);
+                    } catch (Exception e) {
+                        LOG.severe(e.getMessage());
+                    }
                 } else {
                     //no CDI, use newInstance()
-                    Object o = c.newInstance();
-                    generator.withOperationsFromSingleton(o, c);
+                    generator.withOperationsFromSingleton(c.getDeclaredConstructor().newInstance(), c);
                 }
             }
             return generator.generate();
-        } catch(Exception e) {
+        } catch (Exception e) {
             LOG.severe(e.getMessage());
         }
         return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    private Object getUnmanagedInstance(Class c) {
-        Unmanaged unmanaged = new Unmanaged(c);
-        Unmanaged.UnmanagedInstance unmanagedInstance = unmanaged.newInstance().produce().inject().postConstruct();
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                unmanagedInstance.preDestroy().dispose();
-            }
-        });
-        return unmanagedInstance.get();
     }
 
     private void returnAsJson(HttpServletResponse response, ExecutionResult executionResult) throws IOException {
