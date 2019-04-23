@@ -37,7 +37,6 @@ import graphql.execution.preparsed.PreparsedDocumentProvider;
 import graphql.schema.GraphQLSchema;
 import io.leangen.graphql.GraphQLSchemaGenerator;
 
-import javax.enterprise.inject.UnsatisfiedResolutionException;
 import javax.enterprise.inject.spi.CDI;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -163,8 +162,6 @@ public class GraphQLServlet extends HttpServlet {
                     //we have CDI, perform injections
                     try {
                         generator.withOperationsFromSingleton(CDI.current().select(c).get(), c);
-                    } catch (UnsatisfiedResolutionException e) {
-                        generator.withOperationsFromSingleton(c.getDeclaredConstructor().newInstance(), c);
                     } catch (Exception e) {
                         LOG.severe(e.getMessage());
                     }
