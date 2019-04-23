@@ -163,7 +163,7 @@ public class GraphQLServlet extends HttpServlet {
                     try {
                         generator.withOperationsFromSingleton(CDI.current().select(c).get(), c);
                     } catch (Exception e) {
-                        LOG.severe(e.getMessage());
+                        generator.withOperationsFromSingleton(c.getDeclaredConstructor().newInstance(), c);
                     }
                 } else {
                     //no CDI, use newInstance()
