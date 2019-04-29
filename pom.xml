@@ -6,7 +6,7 @@
 
     <groupId>com.kumuluz.ee.graphql</groupId>
     <artifactId>kumuluzee-graphql-parent</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.0.2</version>
 
     <packaging>pom</packaging>
 
@@ -30,7 +30,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <kumuluzee.version>3.2.0</kumuluzee.version>
+        <kumuluzee.version>3.4.0</kumuluzee.version>
         <graphql-java.version>11.0</graphql-java.version>
         <gson.version>2.8.5</gson.version>
         <spqr.version>0.9.9</spqr.version>
