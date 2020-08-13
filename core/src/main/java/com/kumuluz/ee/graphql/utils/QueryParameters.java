@@ -54,7 +54,6 @@ public class QueryParameters {
         return parameters;
     }
 
-
     private static Map<String, Object> getVariables(Object variables) {
         if (variables instanceof Map) {
             Map<?, ?> inputVars = (Map) variables;
@@ -83,5 +82,4 @@ public class QueryParameters {
             throw new RuntimeException(e);
         }
     }
-
 }

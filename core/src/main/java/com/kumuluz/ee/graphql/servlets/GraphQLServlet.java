@@ -24,6 +24,7 @@ package com.kumuluz.ee.graphql.servlets;
 import com.kumuluz.ee.common.dependencies.EeComponentType;
 import com.kumuluz.ee.common.runtime.EeRuntime;
 import com.kumuluz.ee.common.runtime.EeRuntimeComponent;
+import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.graphql.GraphQLApplication;
 import com.kumuluz.ee.graphql.utils.JsonKit;
 import com.kumuluz.ee.graphql.utils.QueryParameters;
@@ -146,17 +147,32 @@ public class GraphQLServlet extends HttpServlet {
     }
 
     private GraphQLSchema buildSchema() {
+        final List<String> basePackages = new ArrayList<>(
+                Arrays.asList("com.kumuluz.ee.graphql.classes")
+        );
+
+        ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
+
         try {
             List<EeRuntimeComponent> components = EeRuntime.getInstance().getEeComponents();
             boolean CDIfound = false;
+
             for (EeRuntimeComponent component : components) {
                 if (component.getType() == EeComponentType.CDI) {
                     CDIfound = true;
                     break;
                 }
             }
+
             List<Class<?>> classes = getResourceClasses();
+
             GraphQLSchemaGenerator generator = new GraphQLSchemaGenerator();
+
+            configurationUtil.getList("kumuluzee.graphql.schema.base-packages")
+                    .ifPresent(basePackages::addAll);
+
+            generator.withBasePackages(basePackages.toArray(new String [0]));
+
             for (Class<?> c : classes) {
                 if (CDIfound) {
                     //we have CDI, perform injections
@@ -170,6 +186,7 @@ public class GraphQLServlet extends HttpServlet {
                     generator.withOperationsFromSingleton(c.getDeclaredConstructor().newInstance(), c);
                 }
             }
+
             return generator.generate();
         } catch (Exception e) {
             LOG.severe(e.getMessage());

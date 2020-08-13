@@ -82,7 +82,7 @@ public class GraphQLUtils<T> {
             p = getDefaultPagination();
         }
         Integer offset = p.getOffset() == null ? configurationUtil.getInteger("kumuluzee.graphql.defaults.offset").orElse(0) : p.getOffset();
-        Integer limit = p.getLimit() == null ? offset + configurationUtil.getInteger("kumuluzee.graphql.defaults.limit").orElse(20) : offset + p.getLimit();
+        Integer limit = p.getLimit() == null ? configurationUtil.getInteger("kumuluzee.graphql.defaults.limit").orElse(20) : p.getLimit();
         int count = list.size();
         PaginationOutput output = new PaginationOutput(p, count);
         if(offset > count) {
@@ -499,7 +499,7 @@ public class GraphQLUtils<T> {
 
         if(p != null) {
             Integer offset = p.getOffset() == null ? configurationUtil.getInteger("kumuluzee.graphql.defaults.offset").orElse(0) : p.getOffset();
-            Integer limit = p.getLimit() == null ? offset + configurationUtil.getInteger("kumuluzee.graphql.defaults.limit").orElse(20) : offset + p.getLimit();
+            Integer limit = p.getLimit() == null ? configurationUtil.getInteger("kumuluzee.graphql.defaults.limit").orElse(20) : p.getLimit();
             qs.setOffset(offset);
             qs.setLimit(limit);
         }
@@ -578,7 +578,7 @@ public class GraphQLUtils<T> {
     public static <T> PaginationWrapper<T> process(EntityManager em, Class<T> tClass, ResolutionEnvironment resolutionEnvironment, Pagination pagination, Sort sort, Filter filter) {
         QueryParameters queryParameters = queryParameters(pagination, sort, filter, true);
         if(resolutionEnvironment != null) {
-            queryParameters.setFields(getFieldsFromResolutionEnvironment(em, tClass, resolutionEnvironment));
+            queryParameters.setFields(getFieldsFromResolutionEnvironment(resolutionEnvironment));
         }
         List<T> studentList = JPAUtils.queryEntities(em, tClass, queryParameters);
         Long size = JPAUtils.queryEntitiesCount(em, tClass, queryParameters);
@@ -616,50 +616,35 @@ public class GraphQLUtils<T> {
     public static<T> List<T> processWithoutPagination(EntityManager em, Class<T> tClass, ResolutionEnvironment resolutionEnvironment, Sort sort, Filter filter) {
         QueryParameters queryParameters = queryParameters(null, sort, filter, false);
         if(resolutionEnvironment != null) {
-            queryParameters.setFields(getFieldsFromResolutionEnvironment(em, tClass, resolutionEnvironment));
+            queryParameters.setFields(getFieldsFromResolutionEnvironment(resolutionEnvironment));
         }
         return JPAUtils.queryEntities(em, tClass, queryParameters);
     }
 
-    private static<T> List<String> getFieldsFromResolutionEnvironment(EntityManager entityManager, Class<T> tClass, ResolutionEnvironment resolutionEnvironment) {
+    private static List<String> getFieldsFromResolutionEnvironment(ResolutionEnvironment resolutionEnvironment) {
         List<String> fields = new ArrayList<>();
 
-        Metamodel metamodel = entityManager.getMetamodel();
-        EntityType<T> type = metamodel.entity(tClass);
-
         DataFetchingEnvironment dataFetchingEnvironment = resolutionEnvironment.dataFetchingEnvironment;
-        Map<String, FragmentDefinition> fragmentDefinitionMap = dataFetchingEnvironment.getFragmentsByName();
-        Map<String, List<Field>> graphqlFields = dataFetchingEnvironment.getSelectionSet().get();
+        Set<String> graphqlFields = dataFetchingEnvironment.getSelectionSet().get().keySet();
 
-        if(graphqlFields.containsKey("result")) {
-            for(String s: graphqlFields.keySet()) {
-                String[] split = s.split("/");
-                if(split[0].equals("result") && split.length == 2) {
-                    if(checkIfJPA(type, split[1])) {
-                        fields.add(split[1]);
-                    }
+        if(graphqlFields.contains("result")) {
+            for(String s: graphqlFields) {
+                String[] split = s.split("/", 2);
+                if(split[0].equals("result") && split.length >= 2) {
+                    fields.add(String.join(".", split[1].split("/")));
                 }
             }
         } else {
-            for(String s: graphqlFields.keySet()) {
+            for(String s: graphqlFields) {
                 String[] split = s.split("/");
-                if(split.length == 1) {
-                    if(checkIfJPA(type, split[0])) {
-                        fields.add(split[0]);
-                    }
+                if(split.length >= 1) {
+                    fields.add(String.join(".", split));
                 }
             }
         }
+
+        fields.removeIf(f -> fields.stream().anyMatch(ff -> !ff.equals(f) && ff.startsWith(f)));
+
         return fields;
     }
-
-    private static boolean checkIfJPA(EntityType entityType, String name) {
-        try {
-            entityType.getAttribute(name);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
 }
