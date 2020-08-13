@@ -76,6 +76,7 @@ public class GraphQLExtension implements Extension {
             String path = configurationUtil.get("kumuluzee.graphql.mapping").orElse("/graphql");
             try {
                 URI u = new URI(path);
+
                 if(u.isAbsolute()) {
                     LOG.severe("URL must be relative. Extension not initialized.");
                     return;
@@ -84,7 +85,8 @@ public class GraphQLExtension implements Extension {
                 LOG.severe("Malformed url: " + path + ". Extension not initialized.");
                 return;
             }
-            if(path.charAt(0) != '/') {
+
+            if (path.charAt(0) != '/') {
                 path = '/' + path;
             }
 

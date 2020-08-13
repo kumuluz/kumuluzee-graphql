@@ -37,16 +37,32 @@ import java.net.URI;
  * @since 1.0.0
  */
 public class GraphQLUIServlet extends HttpServlet {
-    private String path = null;
+
+    private String graphQlPath = null;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
+
         PrintWriter w = resp.getWriter();
-        if(path == null) {
-            ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
-            path = configurationUtil.get("kumuluzee.graphql.mapping").orElse("/graphql");
+
+        if (this.graphQlPath == null) {
+            String contextPath = configurationUtil.get("kumuluzee.server.context-path").orElse("");
+            String path = configurationUtil.get("kumuluzee.graphql.mapping").orElse("/graphql");
+
+            if (contextPath.endsWith("/")) {
+                contextPath = contextPath.substring(0, contextPath.length() - 1);
+            }
+
+            if (!path.startsWith("/")) {
+                path = "/" + path;
+            }
+
+            path = contextPath + path;
+
             try {
                 URI u = new URI(path);
+
                 if(u.isAbsolute()) {
                     w.println("URL must be relative. Extension not initialized.");
                     return;
@@ -55,17 +71,22 @@ public class GraphQLUIServlet extends HttpServlet {
                 w.println("Malformed url: " + path + ". Extension not initialized.");
                 return;
             }
-            if(path.charAt(0) != '/') {
+
+            if (path.charAt(0) != '/') {
                 path = '/' + path;
             }
+
+            graphQlPath = path;
         }
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/html/graphiql.html")))) {
             String line;
+
             while ((line = br.readLine()) != null) {
                 if (line.contains("$PATH")) {
-                    line = line.replace("$PATH", path);
+                    line = line.replace("$PATH", graphQlPath);
                 }
+
                 w.println(line);
             }
         }
