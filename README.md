@@ -52,6 +52,23 @@ annotated functions in annotated classes will be added to your GraphQL schema.
 @GraphQLClass
 public class HelloWorld {...}
 ```
+
+#### GraphQL schema generation
+
+When generating the GraphQL schema, the scanner will only process classes within the same package. What does that mean? Well, if your output class is located in 
+package `com.example` and it extends a base class, which is located in `com.example.common`, the scanner will only scan the `com.example` package).
+
+To fix this you have to provide a list of packages that should be scanned when building the GraphQL schema:
+
+```yaml
+graphql:
+  schema:
+    base-packages:
+      - com.example
+      - com.example.common
+      - org.example.impl
+```
+
 ### Defining GraphQL queries 
 The `@GraphQLQuery` annotation will register your Java function as a Query function in GraphQL. All types and 
 parameters will be automatically converted to GraphQL types and added to the schema. You can override the query name (which defaults to the function name) or add a description to the query.
