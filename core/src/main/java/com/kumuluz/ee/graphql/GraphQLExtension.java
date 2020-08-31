@@ -90,6 +90,8 @@ public class GraphQLExtension implements Extension {
                 path = '/' + path;
             }
 
+            LOG.info("GraphQL registered on " + path + " (servlet context is implied).");
+
             JettyServletServer server = (JettyServletServer) kumuluzServerWrapper.getServer();
             server.registerServlet(GraphQLServlet.class, path);
 

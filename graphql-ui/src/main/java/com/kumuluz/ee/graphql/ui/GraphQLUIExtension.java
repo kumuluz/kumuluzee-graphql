@@ -65,8 +65,12 @@ public class GraphQLUIExtension implements Extension {
                 if(mapping.charAt(0) != '/') {
                     mapping = '/' + mapping;
                 }
+
+                LOG.info("GraphQL UI registered on " + mapping + " (servlet context is implied).");
+
                 JettyServletServer server = (JettyServletServer) kumuluzServerWrapper.getServer();
                 server.registerServlet(GraphQLUIServlet.class, mapping);
+
                 LOG.info("GraphQL UI extension initialized.");
             } else {
                 LOG.info("GraphQL UI disabled. You can enable it explicitly by setting field kumuluzee.graphql.ui.enabled to true.");
