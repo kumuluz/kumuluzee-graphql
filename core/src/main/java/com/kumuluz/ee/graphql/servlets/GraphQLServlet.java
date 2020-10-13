@@ -89,7 +89,7 @@ public class GraphQLServlet extends HttpServlet {
         if (schema == null) {
             List<GraphQLApplication> applications = new ArrayList<>();
             ServiceLoader.load(GraphQLApplication.class).forEach(applications::add);
-            Class applicationClass;
+            Class<?> applicationClass;
             if (applications.size() == 1) {
                 applicationClass = applications.get(0).getClass();
             } else {
@@ -148,7 +148,7 @@ public class GraphQLServlet extends HttpServlet {
 
     private GraphQLSchema buildSchema() {
         final List<String> basePackages = new ArrayList<>(
-                Arrays.asList("com.kumuluz.ee.graphql.classes")
+                Collections.singletonList("com.kumuluz.ee.graphql.classes")
         );
 
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
@@ -211,7 +211,7 @@ public class GraphQLServlet extends HttpServlet {
             while (scanner.hasNextLine()) {
                 String className = scanner.nextLine();
                 try {
-                    Class resourceClass = Class.forName(className);
+                    Class<?> resourceClass = Class.forName(className);
                     resourceClasses.add(resourceClass);
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();

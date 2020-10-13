@@ -56,7 +56,7 @@ public class QueryParameters {
 
     private static Map<String, Object> getVariables(Object variables) {
         if (variables instanceof Map) {
-            Map<?, ?> inputVars = (Map) variables;
+            Map<?, ?> inputVars = (Map<?, ?>) variables;
             Map<String, Object> vars = new HashMap<>();
             inputVars.forEach((k, v) -> vars.put(String.valueOf(k), v));
             return vars;

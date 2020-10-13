@@ -27,7 +27,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * GraphQLConfiguration annotation - enables applicatino class to be scanned for adding custom contexts.
+ * GraphQLConfiguration annotation - enables application class to be scanned for adding custom contexts.
  *
  * @author Domen Kajdic
  * @since 1.0.0
