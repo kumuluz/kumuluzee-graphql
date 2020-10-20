@@ -18,37 +18,21 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+package com.kumuluz.ee.graphql;
 
-package com.kumuluz.ee.graphql.classes;
-
-import com.kumuluz.ee.rest.enums.OrderDirection;
+import org.jboss.arquillian.container.test.spi.client.deployment.AuxiliaryArchiveAppender;
+import org.jboss.arquillian.core.spi.LoadableExtension;
 
 /**
- * SortField class
+ * Registers library appender with Arquillian.
  *
- * @author Domen Kajdic
- * @since 1.0.0
+ * @author Urban Malc
+ * @since 1.2.0
  */
-public class SortField {
-    private String field;
-    private OrderDirection order;
+public class GraphQLArquillianExtension implements LoadableExtension {
 
-    public SortField() {
-    }
-
-    public String getField() {
-        return field;
-    }
-
-    public OrderDirection getOrder() {
-        return order;
-    }
-
-//    public void setField(@GraphQLNonNull String field) { // TODO
-//        this.field = field;
-//    }
-
-    public void setOrder(OrderDirection order) {
-        this.order = order;
+    @Override
+    public void register(ExtensionBuilder extensionBuilder) {
+        extensionBuilder.service(AuxiliaryArchiveAppender.class, GraphQLLibraryAppender.class);
     }
 }

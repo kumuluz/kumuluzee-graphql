@@ -29,8 +29,9 @@ import com.kumuluz.ee.common.dependencies.EeExtensionDef;
 import com.kumuluz.ee.common.exceptions.KumuluzServerException;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
-import com.kumuluz.ee.graphql.servlets.GraphQLServlet;
 import com.kumuluz.ee.jetty.JettyServletServer;
+import io.smallrye.graphql.servlet.ExecutionServlet;
+import io.smallrye.graphql.servlet.SchemaServlet;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -90,11 +91,11 @@ public class GraphQLExtension implements Extension {
                 path = '/' + path;
             }
 
-            LOG.info("GraphQL registered on " + path + " (servlet context is implied).");
-
             JettyServletServer server = (JettyServletServer) kumuluzServerWrapper.getServer();
-            server.registerServlet(GraphQLServlet.class, path);
+            server.registerServlet(SchemaServlet.class, "/graphql/schema.graphql"); // TODO use path
+            server.registerServlet(ExecutionServlet.class, "/graphql/*"); // TODO use path
 
+            LOG.info("GraphQL registered on " + path + " (servlet context is implied).");
             LOG.info("GraphQL extension initialized.");
         }
     }

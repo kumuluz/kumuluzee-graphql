@@ -27,7 +27,6 @@ package com.kumuluz.ee.graphql.classes;
  * @author Domen Kajdic
  * @since 1.0.0
  */
-import io.leangen.graphql.annotations.GraphQLNonNull;
 
 import java.util.List;
 
@@ -41,7 +40,7 @@ public class Sort {
         return fields;
     }
 
-    public void setFields(@GraphQLNonNull List<@GraphQLNonNull SortField> fields) {
-        this.fields = fields;
-    }
+//    public void setFields(@GraphQLNonNull List<@GraphQLNonNull SortField> fields) { // TODO
+//        this.fields = fields;
+//    }
 }

@@ -22,7 +22,6 @@
 package com.kumuluz.ee.graphql.classes;
 
 import com.kumuluz.ee.rest.enums.FilterOperation;
-import io.leangen.graphql.annotations.GraphQLNonNull;
 
 /**
  * FilterField class
@@ -55,13 +54,13 @@ public class FilterField {
         return type;
     }
 
-    public void setOp(@GraphQLNonNull FilterOperation op) {
-        this.op = op;
-    }
-
-    public void setField(@GraphQLNonNull String field) {
-        this.field = field;
-    }
+//    public void setOp(@GraphQLNonNull FilterOperation op) { // TODO
+//        this.op = op;
+//    }
+//
+//    public void setField(@GraphQLNonNull String field) {
+//        this.field = field;
+//    }
 
     public void setValue(String value) {
         this.value = value;

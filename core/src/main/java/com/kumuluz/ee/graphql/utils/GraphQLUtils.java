@@ -28,18 +28,8 @@ import com.kumuluz.ee.rest.beans.QueryOrder;
 import com.kumuluz.ee.rest.beans.QueryParameters;
 import com.kumuluz.ee.rest.enums.FilterOperation;
 import com.kumuluz.ee.rest.enums.OrderDirection;
-import com.kumuluz.ee.rest.utils.JPAUtils;
-
 import graphql.GraphQLException;
-import graphql.language.*;
-import graphql.schema.DataFetchingEnvironment;
-import graphql.schema.DataFetchingFieldSelectionSet;
-import io.leangen.graphql.execution.ResolutionEnvironment;
 
-import javax.persistence.EntityManager;
-import javax.persistence.metamodel.Attribute;
-import javax.persistence.metamodel.EntityType;
-import javax.persistence.metamodel.Metamodel;
 import java.lang.reflect.Method;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -547,104 +537,105 @@ public class GraphQLUtils<T> {
         return wrapList(list, pagination, null);
     }
 
-    public static <T> PaginationWrapper<T> process(EntityManager em, Class<T> tClass, ResolutionEnvironment resolutionEnvironment, Pagination pagination, Sort sort) {
-        return process(em, tClass, resolutionEnvironment, pagination, sort,null);
-    }
-
-    public static <T> PaginationWrapper<T> process(EntityManager em, Class<T> tClass, ResolutionEnvironment resolutionEnvironment, Pagination pagination, Filter filter) {
-        return process(em, tClass, resolutionEnvironment, pagination, null, filter);
-    }
-
-    public static <T> PaginationWrapper<T> process(EntityManager em, Class<T> tClass, ResolutionEnvironment resolutionEnvironment, Pagination pagination) {
-        return process(em, tClass,resolutionEnvironment, pagination, null,null);
-    }
-
-    public static <T> PaginationWrapper<T> process(EntityManager em, Class<T> tClass, Pagination pagination, Sort sort) {
-        return process(em, tClass, null, pagination, sort,null);
-    }
-
-    public static <T> PaginationWrapper<T> process(EntityManager em, Class<T> tClass, Pagination pagination, Filter filter) {
-        return process(em, tClass, null, pagination, null, filter);
-    }
-
-    public static <T> PaginationWrapper<T> process(EntityManager em, Class<T> tClass, Pagination pagination) {
-        return process(em, tClass,null, pagination, null,null);
-    }
-
-    public static <T> PaginationWrapper<T> process(EntityManager em, Class<T> tClass, Pagination pagination, Sort sort, Filter filter) {
-        return process(em, tClass, null, pagination, sort, filter);
-    }
-
-    public static <T> PaginationWrapper<T> process(EntityManager em, Class<T> tClass, ResolutionEnvironment resolutionEnvironment, Pagination pagination, Sort sort, Filter filter) {
-        QueryParameters queryParameters = queryParameters(pagination, sort, filter, true);
-        if(resolutionEnvironment != null) {
-            queryParameters.setFields(getFieldsFromResolutionEnvironment(resolutionEnvironment));
-        }
-        List<T> studentList = JPAUtils.queryEntities(em, tClass, queryParameters);
-        Long size = JPAUtils.queryEntitiesCount(em, tClass, queryParameters);
-        return GraphQLUtils.wrapList(studentList, pagination, size.intValue());
-    }
-
-    public static<T> List<T> processWithoutPagination(EntityManager em, Class<T> tClass) {
-        return processWithoutPagination(em, tClass, null, null, null);
-    }
-
-    public static<T> List<T> processWithoutPagination(EntityManager em, Class<T> tClass, ResolutionEnvironment resolutionEnvironment) {
-        return processWithoutPagination(em, tClass, resolutionEnvironment, null, null);
-    }
-
-    public static<T> List<T> processWithoutPagination(EntityManager em, Class<T> tClass, ResolutionEnvironment resolutionEnvironment, Sort sort) {
-        return processWithoutPagination(em, tClass, resolutionEnvironment, sort, null);
-    }
-
-    public static<T> List<T> processWithoutPagination(EntityManager em, Class<T> tClass, ResolutionEnvironment resolutionEnvironment, Filter filter) {
-        return processWithoutPagination(em, tClass, resolutionEnvironment, null, filter);
-    }
-
-    public static<T> List<T> processWithoutPagination(EntityManager em, Class<T> tClass, Sort sort) {
-        return processWithoutPagination(em, tClass, null, sort, null);
-    }
-
-    public static<T> List<T> processWithoutPagination(EntityManager em, Class<T> tClass, Filter filter) {
-        return processWithoutPagination(em, tClass, null, null, filter);
-    }
-
-    public static<T> List<T> processWithoutPagination(EntityManager em, Class<T> tClass, Sort sort, Filter filter) {
-        return processWithoutPagination(em, tClass, null, sort, filter);
-    }
-
-    public static<T> List<T> processWithoutPagination(EntityManager em, Class<T> tClass, ResolutionEnvironment resolutionEnvironment, Sort sort, Filter filter) {
-        QueryParameters queryParameters = queryParameters(null, sort, filter, false);
-        if(resolutionEnvironment != null) {
-            queryParameters.setFields(getFieldsFromResolutionEnvironment(resolutionEnvironment));
-        }
-        return JPAUtils.queryEntities(em, tClass, queryParameters);
-    }
-
-    private static List<String> getFieldsFromResolutionEnvironment(ResolutionEnvironment resolutionEnvironment) {
-        List<String> fields = new ArrayList<>();
-
-        DataFetchingEnvironment dataFetchingEnvironment = resolutionEnvironment.dataFetchingEnvironment;
-        Set<String> graphqlFields = dataFetchingEnvironment.getSelectionSet().get().keySet();
-
-        if(graphqlFields.contains("result")) {
-            for(String s: graphqlFields) {
-                String[] split = s.split("/", 2);
-                if(split[0].equals("result") && split.length >= 2) {
-                    fields.add(String.join(".", split[1].split("/")));
-                }
-            }
-        } else {
-            for(String s: graphqlFields) {
-                String[] split = s.split("/");
-                if(split.length >= 1) {
-                    fields.add(String.join(".", split));
-                }
-            }
-        }
-
-        fields.removeIf(f -> fields.stream().anyMatch(ff -> !ff.equals(f) && ff.startsWith(f)));
-
-        return fields;
-    }
+    // TODO
+//    public static <T> PaginationWrapper<T> process(EntityManager em, Class<T> tClass, ResolutionEnvironment resolutionEnvironment, Pagination pagination, Sort sort) {
+//        return process(em, tClass, resolutionEnvironment, pagination, sort,null);
+//    }
+//
+//    public static <T> PaginationWrapper<T> process(EntityManager em, Class<T> tClass, ResolutionEnvironment resolutionEnvironment, Pagination pagination, Filter filter) {
+//        return process(em, tClass, resolutionEnvironment, pagination, null, filter);
+//    }
+//
+//    public static <T> PaginationWrapper<T> process(EntityManager em, Class<T> tClass, ResolutionEnvironment resolutionEnvironment, Pagination pagination) {
+//        return process(em, tClass,resolutionEnvironment, pagination, null,null);
+//    }
+//
+//    public static <T> PaginationWrapper<T> process(EntityManager em, Class<T> tClass, Pagination pagination, Sort sort) {
+//        return process(em, tClass, null, pagination, sort,null);
+//    }
+//
+//    public static <T> PaginationWrapper<T> process(EntityManager em, Class<T> tClass, Pagination pagination, Filter filter) {
+//        return process(em, tClass, null, pagination, null, filter);
+//    }
+//
+//    public static <T> PaginationWrapper<T> process(EntityManager em, Class<T> tClass, Pagination pagination) {
+//        return process(em, tClass,null, pagination, null,null);
+//    }
+//
+//    public static <T> PaginationWrapper<T> process(EntityManager em, Class<T> tClass, Pagination pagination, Sort sort, Filter filter) {
+//        return process(em, tClass, null, pagination, sort, filter);
+//    }
+//
+//    public static <T> PaginationWrapper<T> process(EntityManager em, Class<T> tClass, ResolutionEnvironment resolutionEnvironment, Pagination pagination, Sort sort, Filter filter) {
+//        QueryParameters queryParameters = queryParameters(pagination, sort, filter, true);
+//        if(resolutionEnvironment != null) {
+//            queryParameters.setFields(getFieldsFromResolutionEnvironment(resolutionEnvironment));
+//        }
+//        List<T> studentList = JPAUtils.queryEntities(em, tClass, queryParameters);
+//        Long size = JPAUtils.queryEntitiesCount(em, tClass, queryParameters);
+//        return GraphQLUtils.wrapList(studentList, pagination, size.intValue());
+//    }
+//
+//    public static<T> List<T> processWithoutPagination(EntityManager em, Class<T> tClass) {
+//        return processWithoutPagination(em, tClass, null, null, null);
+//    }
+//
+//    public static<T> List<T> processWithoutPagination(EntityManager em, Class<T> tClass, ResolutionEnvironment resolutionEnvironment) {
+//        return processWithoutPagination(em, tClass, resolutionEnvironment, null, null);
+//    }
+//
+//    public static<T> List<T> processWithoutPagination(EntityManager em, Class<T> tClass, ResolutionEnvironment resolutionEnvironment, Sort sort) {
+//        return processWithoutPagination(em, tClass, resolutionEnvironment, sort, null);
+//    }
+//
+//    public static<T> List<T> processWithoutPagination(EntityManager em, Class<T> tClass, ResolutionEnvironment resolutionEnvironment, Filter filter) {
+//        return processWithoutPagination(em, tClass, resolutionEnvironment, null, filter);
+//    }
+//
+//    public static<T> List<T> processWithoutPagination(EntityManager em, Class<T> tClass, Sort sort) {
+//        return processWithoutPagination(em, tClass, null, sort, null);
+//    }
+//
+//    public static<T> List<T> processWithoutPagination(EntityManager em, Class<T> tClass, Filter filter) {
+//        return processWithoutPagination(em, tClass, null, null, filter);
+//    }
+//
+//    public static<T> List<T> processWithoutPagination(EntityManager em, Class<T> tClass, Sort sort, Filter filter) {
+//        return processWithoutPagination(em, tClass, null, sort, filter);
+//    }
+//
+//    public static<T> List<T> processWithoutPagination(EntityManager em, Class<T> tClass, ResolutionEnvironment resolutionEnvironment, Sort sort, Filter filter) {
+//        QueryParameters queryParameters = queryParameters(null, sort, filter, false);
+//        if(resolutionEnvironment != null) {
+//            queryParameters.setFields(getFieldsFromResolutionEnvironment(resolutionEnvironment));
+//        }
+//        return JPAUtils.queryEntities(em, tClass, queryParameters);
+//    }
+//
+//    private static List<String> getFieldsFromResolutionEnvironment(ResolutionEnvironment resolutionEnvironment) {
+//        List<String> fields = new ArrayList<>();
+//
+//        DataFetchingEnvironment dataFetchingEnvironment = resolutionEnvironment.dataFetchingEnvironment;
+//        Set<String> graphqlFields = dataFetchingEnvironment.getSelectionSet().get().keySet();
+//
+//        if(graphqlFields.contains("result")) {
+//            for(String s: graphqlFields) {
+//                String[] split = s.split("/", 2);
+//                if(split[0].equals("result") && split.length >= 2) {
+//                    fields.add(String.join(".", split[1].split("/")));
+//                }
+//            }
+//        } else {
+//            for(String s: graphqlFields) {
+//                String[] split = s.split("/");
+//                if(split.length >= 1) {
+//                    fields.add(String.join(".", split));
+//                }
+//            }
+//        }
+//
+//        fields.removeIf(f -> fields.stream().anyMatch(ff -> !ff.equals(f) && ff.startsWith(f)));
+//
+//        return fields;
+//    }
 }

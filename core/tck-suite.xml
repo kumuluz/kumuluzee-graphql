@@ -1,0 +1,13 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+
+<suite name="microprofile-graphql-TCK" verbose="2" configfailurepolicy="continue">
+    <listeners>
+        <listener class-name="com.kumuluz.ee.graphql.SkipTestListener" />
+    </listeners>
+    <test name="microprofile-config TCK">
+        <packages>
+            <package name="org.eclipse.microprofile.graphql.tck.*"/>
+<!--            <package name="com.kumuluz.ee.graphql.tests.*"/>-->
+        </packages>
+    </test>
+</suite>

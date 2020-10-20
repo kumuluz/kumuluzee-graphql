@@ -21,7 +21,6 @@
 
 package com.kumuluz.ee.graphql.classes;
 
-import io.leangen.graphql.annotations.GraphQLNonNull;
 
 /**
  * Pagination class - pagination input when querying with pagination
@@ -49,11 +48,11 @@ public class Pagination {
         return offset;
     }
 
-    public void setLimit(@GraphQLNonNull Integer limit) {
-        this.limit = limit;
-    }
-
-    public void setOffset(@GraphQLNonNull Integer offset) {
-        this.offset = offset;
-    }
+//    public void setLimit(@GraphQLNonNull Integer limit) { // TODO
+//        this.limit = limit;
+//    }
+//
+//    public void setOffset(@GraphQLNonNull Integer offset) {
+//        this.offset = offset;
+//    }
 }
