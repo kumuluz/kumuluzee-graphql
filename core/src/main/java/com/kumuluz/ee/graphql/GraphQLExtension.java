@@ -25,6 +25,7 @@ import com.kumuluz.ee.common.config.EeConfig;
 import com.kumuluz.ee.common.dependencies.EeComponentDependency;
 import com.kumuluz.ee.common.dependencies.EeComponentType;
 import com.kumuluz.ee.common.dependencies.EeExtensionDef;
+import com.kumuluz.ee.common.dependencies.EeExtensionGroup;
 import com.kumuluz.ee.common.exceptions.KumuluzServerException;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
@@ -43,7 +44,7 @@ import java.util.logging.Logger;
  * @author Domen Kajdic
  * @since 1.0.0
  */
-@EeExtensionDef(name = "GraphQL", group = "GRAPHQL")
+@EeExtensionDef(name = "GraphQL", group = EeExtensionGroup.GRAPHQL)
 @EeComponentDependency(EeComponentType.SERVLET)
 public class GraphQLExtension implements Extension {
 

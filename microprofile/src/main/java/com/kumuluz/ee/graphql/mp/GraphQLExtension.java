@@ -5,6 +5,7 @@ import com.kumuluz.ee.common.config.EeConfig;
 import com.kumuluz.ee.common.dependencies.EeComponentDependency;
 import com.kumuluz.ee.common.dependencies.EeComponentType;
 import com.kumuluz.ee.common.dependencies.EeExtensionDef;
+import com.kumuluz.ee.common.dependencies.EeExtensionGroup;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.jetty.JettyServletServer;
@@ -20,7 +21,7 @@ import java.util.logging.Logger;
  * @author Urban Malc
  * @since 1.2.0
  */
-@EeExtensionDef(name = "MicroProfileGraphQL", group = "GRAPHQL")
+@EeExtensionDef(name = "MicroProfileGraphQL", group = EeExtensionGroup.GRAPHQL)
 @EeComponentDependency(EeComponentType.SERVLET)
 public class GraphQLExtension implements Extension {
 
@@ -41,10 +42,10 @@ public class GraphQLExtension implements Extension {
     @Override
     public void init(KumuluzServerWrapper kumuluzServerWrapper, EeConfig eeConfig) {
         if (kumuluzServerWrapper.getServer() instanceof JettyServletServer) {
-            LOG.info("Initializing GraphQL extension.");
+            LOG.info("Initializing GraphQL MP extension.");
             ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
 
-            String path = configurationUtil.get("kumuluzee.graphql.mapping").orElse("/graphql");
+            String path = configurationUtil.get("kumuluzee.graphql.mapping").orElse("graphql");
             try {
                 URI u = new URI(path);
 
@@ -57,16 +58,20 @@ public class GraphQLExtension implements Extension {
                 return;
             }
 
-            if (path.charAt(0) != '/') {
-                path = '/' + path;
+            // strip "/"
+            while (path.startsWith("/")) {
+                path = path.substring(1);
+            }
+            while (path.endsWith("/")) {
+                path = path.substring(1, path.length() - 1);
             }
 
             JettyServletServer server = (JettyServletServer) kumuluzServerWrapper.getServer();
-            server.registerServlet(SchemaServlet.class, "/graphql/schema.graphql"); // TODO use path
-            server.registerServlet(ExecutionServlet.class, "/graphql/*"); // TODO use path
+            server.registerServlet(SchemaServlet.class, "/" + path + "/schema.graphql");
+            server.registerServlet(ExecutionServlet.class, "/" + path + "/*");
 
-            LOG.info("GraphQL registered on " + path + " (servlet context is implied).");
-            LOG.info("GraphQL extension initialized.");
+            LOG.info("GraphQL MP registered on /" + path + " (servlet context is implied).");
+            LOG.info("GraphQL MP extension initialized.");
         }
     }
 }
