@@ -18,7 +18,6 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.kumuluz.ee.graphql.processor;
 
 import com.kumuluz.ee.graphql.annotations.GraphQLApplicationClass;
@@ -38,7 +37,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-// TODO remove
 public class AnnotationProcessor extends AbstractProcessor{
     private Filer filer;
 

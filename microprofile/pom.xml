@@ -42,7 +42,6 @@
         <dependency>
             <groupId>com.kumuluz.ee</groupId>
             <artifactId>kumuluzee-loader</artifactId>
-            <version>${kumuluzee.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

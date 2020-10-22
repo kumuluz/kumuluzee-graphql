@@ -18,8 +18,11 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.kumuluz.ee.graphql.classes;
+
+import io.leangen.graphql.annotations.GraphQLNonNull;
+
+import java.util.List;
 
 /**
  * Sort class - sort input
@@ -27,9 +30,6 @@ package com.kumuluz.ee.graphql.classes;
  * @author Domen Kajdic
  * @since 1.0.0
  */
-
-import java.util.List;
-
 public class Sort {
     private List<SortField> fields;
 
@@ -40,7 +40,7 @@ public class Sort {
         return fields;
     }
 
-//    public void setFields(@GraphQLNonNull List<@GraphQLNonNull SortField> fields) { // TODO
-//        this.fields = fields;
-//    }
+    public void setFields(@GraphQLNonNull List<@GraphQLNonNull SortField> fields) {
+        this.fields = fields;
+    }
 }

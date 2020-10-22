@@ -18,9 +18,10 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.kumuluz.ee.graphql.classes;
 
+
+import io.leangen.graphql.annotations.GraphQLNonNull;
 
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class Filter {
         return fields;
     }
 
-//    public void setFields(@GraphQLNonNull List<@GraphQLNonNull FilterField> fields) { // TODO
-//        this.fields = fields;
-//    }
+    public void setFields(@GraphQLNonNull List<@GraphQLNonNull FilterField> fields) {
+        this.fields = fields;
+    }
 }

@@ -20,8 +20,10 @@
  */
 package com.kumuluz.ee.graphql.utils;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.spi.JsonbProvider;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,8 +40,6 @@ import java.util.stream.Collectors;
  * @since 1.0.0
  */
 public class QueryParameters {
-
-    private static final Jsonb JSONB = JsonbProvider.provider().create().build();
 
     private String query;
     private String operationName;
@@ -87,12 +87,21 @@ public class QueryParameters {
             inputVars.forEach((k, v) -> vars.put(String.valueOf(k), v));
             return vars;
         }
-        return JSONB.fromJson(String.valueOf(variables), Map.class);
+        try {
+            return new ObjectMapper().readValue(String.valueOf(variables),
+                    new TypeReference<Map<String, Object>>() {});
+        } catch (JsonProcessingException e) {
+            return null;
+        }
     }
 
     private static Map<String, Object> readJSON(HttpServletRequest request) {
         String s = readPostBody(request);
-        return JSONB.fromJson(String.valueOf(s), Map.class);
+        try {
+            return new ObjectMapper().readValue(s, new TypeReference<Map<String, Object>>() {});
+        } catch (JsonProcessingException e) {
+            return null;
+        }
     }
 
     private static String readPostBody(HttpServletRequest request) {

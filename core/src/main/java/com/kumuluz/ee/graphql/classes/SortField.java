@@ -18,10 +18,10 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.kumuluz.ee.graphql.classes;
 
 import com.kumuluz.ee.rest.enums.OrderDirection;
+import io.leangen.graphql.annotations.GraphQLNonNull;
 
 /**
  * SortField class
@@ -44,9 +44,9 @@ public class SortField {
         return order;
     }
 
-//    public void setField(@GraphQLNonNull String field) { // TODO
-//        this.field = field;
-//    }
+    public void setField(@GraphQLNonNull String field) {
+        this.field = field;
+    }
 
     public void setOrder(OrderDirection order) {
         this.order = order;

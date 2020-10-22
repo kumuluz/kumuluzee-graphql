@@ -18,7 +18,6 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.kumuluz.ee.graphql;
 
 import com.kumuluz.ee.common.Extension;
@@ -29,9 +28,8 @@ import com.kumuluz.ee.common.dependencies.EeExtensionDef;
 import com.kumuluz.ee.common.exceptions.KumuluzServerException;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.graphql.servlets.GraphQLServlet;
 import com.kumuluz.ee.jetty.JettyServletServer;
-import io.smallrye.graphql.servlet.ExecutionServlet;
-import io.smallrye.graphql.servlet.SchemaServlet;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -92,8 +90,7 @@ public class GraphQLExtension implements Extension {
             }
 
             JettyServletServer server = (JettyServletServer) kumuluzServerWrapper.getServer();
-            server.registerServlet(SchemaServlet.class, "/graphql/schema.graphql"); // TODO use path
-            server.registerServlet(ExecutionServlet.class, "/graphql/*"); // TODO use path
+            server.registerServlet(GraphQLServlet.class, path);
 
             LOG.info("GraphQL registered on " + path + " (servlet context is implied).");
             LOG.info("GraphQL extension initialized.");
