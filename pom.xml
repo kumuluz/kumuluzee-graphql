@@ -13,6 +13,7 @@
     <modules>
         <module>core</module>
         <module>graphql-ui</module>
+        <module>microprofile</module>
     </modules>
 
     <name>KumuluzEE GraphQL Parent</name>
@@ -238,7 +239,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>compile-important-processor</id><!-- TODO remove -->
+                        <id>compile-important-processor</id>
                         <phase>process-test-sources</phase>
                         <goals>
                             <goal>testCompile</goal>

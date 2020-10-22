@@ -18,7 +18,7 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.kumuluz.ee.graphql;
+package com.kumuluz.ee.graphql.mp;
 
 import com.kumuluz.ee.testing.arquillian.spi.MavenDependencyAppender;
 
@@ -35,7 +35,7 @@ import java.util.ResourceBundle;
 public class DependencyAppender implements MavenDependencyAppender {
 
     private static final ResourceBundle versionsBundle = ResourceBundle
-            .getBundle("META-INF/kumuluzee/graphql/versions");
+            .getBundle("META-INF/kumuluzee/graphql-mp/versions");
 
     @Override
     public List<String> addLibraries() {

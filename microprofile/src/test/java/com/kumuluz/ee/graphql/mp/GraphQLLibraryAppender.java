@@ -18,21 +18,31 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.kumuluz.ee.graphql;
+package com.kumuluz.ee.graphql.mp;
 
-import org.jboss.arquillian.container.test.spi.client.deployment.AuxiliaryArchiveAppender;
-import org.jboss.arquillian.core.spi.LoadableExtension;
+import com.kumuluz.ee.graphql.mp.smallrye.GraphQLSchemaInitializer;
+import com.kumuluz.ee.graphql.mp.utils.JarUtils;
+import org.jboss.arquillian.container.test.spi.client.deployment.CachedAuxilliaryArchiveAppender;
+import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 
 /**
- * Registers library appender with Arquillian.
+ * Adds GraphQL library (this repo) to deployments.
  *
  * @author Urban Malc
  * @since 1.2.0
  */
-public class GraphQLArquillianExtension implements LoadableExtension {
+public class GraphQLLibraryAppender extends CachedAuxilliaryArchiveAppender {
 
     @Override
-    public void register(ExtensionBuilder extensionBuilder) {
-        extensionBuilder.service(AuxiliaryArchiveAppender.class, GraphQLLibraryAppender.class);
+    protected Archive<?> buildArchive() {
+
+        return ShrinkWrap.create(JavaArchive.class, "kumuluzee-graphql.jar")
+                .addClass(GraphQLExtension.class)
+                .addPackages(true, JarUtils.class.getPackage())
+                .addPackages(true, GraphQLSchemaInitializer.class.getPackage())
+                .addAsServiceProvider(com.kumuluz.ee.common.Extension.class, GraphQLExtension.class)
+                .addAsResource("META-INF/beans.xml");
     }
 }

@@ -2,7 +2,7 @@
 
 <suite name="microprofile-graphql-TCK" verbose="2" configfailurepolicy="continue">
     <listeners>
-        <listener class-name="com.kumuluz.ee.graphql.SkipTestListener" />
+        <listener class-name="com.kumuluz.ee.graphql.mp.SkipTestListener" />
     </listeners>
     <test name="microprofile-config TCK">
         <packages>

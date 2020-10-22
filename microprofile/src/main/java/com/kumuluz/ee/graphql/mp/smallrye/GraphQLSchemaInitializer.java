@@ -18,27 +18,24 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.kumuluz.ee.graphql.smallrye;
+package com.kumuluz.ee.graphql.mp.smallrye;
 
 import com.kumuluz.ee.common.config.EeConfig;
 import com.kumuluz.ee.common.utils.ResourceUtils;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
-import com.kumuluz.ee.graphql.utils.JarUtils;
+import com.kumuluz.ee.graphql.mp.utils.JarUtils;
 import graphql.schema.GraphQLSchema;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
-import io.smallrye.graphql.cdi.config.GraphQLConfig;
 import io.smallrye.graphql.cdi.producer.GraphQLProducer;
 import io.smallrye.graphql.schema.SchemaBuilder;
 import io.smallrye.graphql.schema.model.Schema;
 import io.smallrye.graphql.servlet.SchemaServlet;
-import io.smallrye.graphql.servlet.SmallRyeGraphQLServletLogging;
 import org.jboss.jandex.IndexView;
 import org.jboss.jandex.Indexer;
 
-import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Initialized;
 import javax.enterprise.event.Observes;
@@ -63,9 +60,6 @@ public class GraphQLSchemaInitializer {
     @Inject
     private GraphQLProducer graphQLProducer;
 
-    @Inject
-    GraphQLConfig config;
-
     public void initialize(@Observes @Initialized(ApplicationScoped.class) Object init) {
 
         if (!(init instanceof ServletContext)) {
@@ -81,12 +75,6 @@ public class GraphQLSchemaInitializer {
         GraphQLSchema graphQLSchema = graphQLProducer.initialize(schema);
 
         servletContext.setAttribute(SchemaServlet.SCHEMA_PROP, graphQLSchema);
-        SmallRyeGraphQLServletLogging.log.initialized();
-    }
-
-    @PreDestroy
-    public void contextDestroyed() {
-        SmallRyeGraphQLServletLogging.log.destroyed();
     }
 
     private IndexView getIndex() {
