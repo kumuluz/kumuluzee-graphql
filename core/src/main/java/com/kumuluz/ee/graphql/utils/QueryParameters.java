@@ -88,19 +88,21 @@ public class QueryParameters {
             return vars;
         }
         try {
-            return new ObjectMapper().readValue(String.valueOf(variables),
+            Map<String, Object> vars = new ObjectMapper().readValue(String.valueOf(variables),
                     new TypeReference<Map<String, Object>>() {});
+            return (vars != null) ? vars : Collections.emptyMap();
         } catch (JsonProcessingException e) {
-            return null;
+            return Collections.emptyMap();
         }
     }
 
     private static Map<String, Object> readJSON(HttpServletRequest request) {
         String s = readPostBody(request);
         try {
-            return new ObjectMapper().readValue(s, new TypeReference<Map<String, Object>>() {});
+            Map<String, Object> json = new ObjectMapper().readValue(s, new TypeReference<Map<String, Object>>() {});
+            return (json != null) ? json : Collections.emptyMap();
         } catch (JsonProcessingException e) {
-            return null;
+            return Collections.emptyMap();
         }
     }
 

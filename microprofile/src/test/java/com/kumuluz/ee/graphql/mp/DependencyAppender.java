@@ -52,8 +52,8 @@ public class DependencyAppender implements MavenDependencyAppender {
                 versionsBundle.getString("graphql-java-version"));
         libs.add("io.smallrye:smallrye-graphql-servlet:" +
                 versionsBundle.getString("smallrye-graphql-version"));
-        libs.add("io.leangen.graphql:spqr:" +
-                versionsBundle.getString("spqr-version"));
+        libs.add("io.github.classgraph:classgraph:" +
+                versionsBundle.getString("classgraph-version"));
         libs.add("org.eclipse.microprofile.graphql:microprofile-graphql-api:" +
                 versionsBundle.getString("microprofile-graphql-version"));
 

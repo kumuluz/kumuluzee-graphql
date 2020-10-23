@@ -37,6 +37,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
+            <version>${graphql-java-legacy.version}</version>
         </dependency>
         <dependency>
             <groupId>com.kumuluz.ee.rest</groupId>

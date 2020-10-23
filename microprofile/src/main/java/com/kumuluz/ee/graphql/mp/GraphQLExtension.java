@@ -2,10 +2,7 @@ package com.kumuluz.ee.graphql.mp;
 
 import com.kumuluz.ee.common.Extension;
 import com.kumuluz.ee.common.config.EeConfig;
-import com.kumuluz.ee.common.dependencies.EeComponentDependency;
-import com.kumuluz.ee.common.dependencies.EeComponentType;
-import com.kumuluz.ee.common.dependencies.EeExtensionDef;
-import com.kumuluz.ee.common.dependencies.EeExtensionGroup;
+import com.kumuluz.ee.common.dependencies.*;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.jetty.JettyServletServer;
@@ -22,7 +19,11 @@ import java.util.logging.Logger;
  * @since 1.2.0
  */
 @EeExtensionDef(name = "MicroProfileGraphQL", group = EeExtensionGroup.GRAPHQL)
-@EeComponentDependency(EeComponentType.SERVLET)
+@EeComponentDependencies({
+        @EeComponentDependency(EeComponentType.SERVLET),
+        @EeComponentDependency(EeComponentType.JSON_B),
+        @EeComponentDependency(EeComponentType.CDI),
+})
 public class GraphQLExtension implements Extension {
 
     private static final Logger LOG = Logger.getLogger(GraphQLExtension.class.getName());
