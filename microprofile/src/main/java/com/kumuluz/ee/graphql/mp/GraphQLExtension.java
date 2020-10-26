@@ -38,6 +38,13 @@ public class GraphQLExtension implements Extension {
 
     @Override
     public void load() {
+        try {
+            Class.forName("com.kumuluz.ee.config.microprofile.MicroprofileConfigExtension");
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("Could not find KumuluzEE Config MP dependency, required by " +
+                    "KumuluzEE GraphQL extension. " +
+                    "Please add it as a dependency: https://github.com/kumuluz/kumuluzee-config-mp");
+        }
     }
 
     @Override
