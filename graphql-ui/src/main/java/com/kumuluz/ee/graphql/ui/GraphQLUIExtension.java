@@ -46,16 +46,34 @@ public class GraphQLUIExtension implements Extension {
     public void load() {
     }
 
+    private boolean checkRequirements() {
+
+        boolean graphqlFound = false;
+        try {
+            Class.forName("com.kumuluz.ee.graphql.GraphQLExtension");
+            graphqlFound = true;
+        } catch (ClassNotFoundException ignored) {
+        }
+        try {
+            Class.forName("com.kumuluz.ee.graphql.mp.GraphQLExtension");
+            graphqlFound = true;
+        } catch (ClassNotFoundException ignored) {
+        }
+
+        if (!graphqlFound) {
+            LOG.severe("Unable to find GraphQL extension, GraphQL UI will not be initialized.");
+        }
+
+        return graphqlFound;
+    }
+
     @Override
     public void init(KumuluzServerWrapper kumuluzServerWrapper, EeConfig eeConfig) {
         if (kumuluzServerWrapper.getServer() instanceof JettyServletServer) {
             LOG.info("Initializing GraphQL UI extension.");
             ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
 
-            try {
-                Class.forName("com.kumuluz.ee.graphql.GraphQLExtension");
-            } catch (ClassNotFoundException e) {
-                LOG.severe("Unable to find GraphQL extension, GraphQL UI will not be initialized: " + e.getMessage());
+            if (!checkRequirements()) {
                 return;
             }
 
