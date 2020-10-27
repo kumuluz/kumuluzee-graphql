@@ -78,10 +78,16 @@ public class GraphQLUIExtension implements Extension {
             }
 
             if(configurationUtil.getBoolean("kumuluzee.graphql.ui.enabled").orElse(true)) {
-                String mapping = configurationUtil.get("kumuluzee.graphql.ui.mapping").orElse("/graphiql");
-                if(mapping.charAt(0) != '/') {
-                    mapping = '/' + mapping;
+                String mapping = configurationUtil.get("kumuluzee.graphql.ui.mapping").orElse("graphiql");
+
+                // strip "/"
+                while (mapping.startsWith("/")) {
+                    mapping = mapping.substring(1);
                 }
+                while (mapping.endsWith("/")) {
+                    mapping = mapping.substring(0, mapping.length() - 1);
+                }
+                mapping = "/" + mapping;
 
                 LOG.info("GraphQL UI registered on " + mapping + " (servlet context is implied).");
 

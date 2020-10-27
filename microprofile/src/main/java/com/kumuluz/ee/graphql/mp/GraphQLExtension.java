@@ -71,7 +71,7 @@ public class GraphQLExtension implements Extension {
                 path = path.substring(1);
             }
             while (path.endsWith("/")) {
-                path = path.substring(1, path.length() - 1);
+                path = path.substring(0, path.length() - 1);
             }
 
             JettyServletServer server = (JettyServletServer) kumuluzServerWrapper.getServer();
