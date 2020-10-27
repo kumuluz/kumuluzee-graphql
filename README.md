@@ -313,6 +313,50 @@ kumuluzee:
       enabled: false
 ```
 
+## Using kumuluzee-security on GraphQL queries
+
+You can use [kumuluzee-security](https://github.com/kumuluz/kumuluzee-security) extension to secure GraphQL queries and
+mutations with familiar annotations `@RolesAllowed`, `@PermitAll`, etc. In order to start using kumuluzee-security first
+create a class that extends `GraphQLApplication` class and annotate it with `@GraphQLApplication` and `@DeclareRoles`.
+For example:
+
+```java
+@GraphQLApplicationClass
+@DeclareRoles({"user", "admin"})
+public class CustomerApp extends GraphQLApplication {
+}
+```
+
+Then secure a class annotated with `@GraphQLApi` by adding `@Secure` annotation. You can then proceed to use the
+standard `@DenyAll`, `@PermitAll` and `@RolesAllowed` annotations. For example:
+
+```java
+@RequestScoped
+@GraphQLApi
+@Secure
+public class CustomerResource {
+
+    @Inject
+    private CustomerService customerBean;
+
+    @Query
+    @PermitAll
+    public List<Customer> getAllCustomers() {
+       return customerBean.getCustomers();
+    }
+
+    @Query
+    @RolesAllowed({"user", "admin"})
+    public Customer getCustomer(@Name("customerId") String customerId) {
+        return customerBean.getCustomer(customerId);
+    }
+}
+```
+
+For a more detailed example of kumuluzee-security integration check out the
+[kumuluzee-graphql-jpa-security](https://github.com/kumuluz/kumuluzee-samples/tree/master/kumuluzee-graphql-jpa-security)
+sample.
+
 ## Changelog
 
 Recent changes can be viewed on Github on the [Releases Page](https://github.com/kumuluz/kumuluzee-graphql/releases).

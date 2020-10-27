@@ -18,10 +18,9 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.kumuluz.ee.graphql.processor;
+package com.kumuluz.ee.graphql.mp.processor;
 
 import com.kumuluz.ee.graphql.annotations.GraphQLApplicationClass;
-import com.kumuluz.ee.graphql.annotations.GraphQLClass;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
@@ -32,31 +31,26 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Collects classes annotated with {@link GraphQLApplicationClass} and writes them to a service file.
+ *
+ * @author Urban Malc
+ * @since 1.2.0
+ */
 public class AnnotationProcessor extends AbstractProcessor {
 
     private Filer filer;
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
-        Set<? extends Element> annotatedClasses = roundEnvironment.getElementsAnnotatedWith(GraphQLClass.class);
-        Set<String> serviceClassNames = new HashSet<>();
-        for (Element element : annotatedClasses) {
-            serviceClassNames.add(element.toString());
-        }
-
-        // write annotated class names to service file
-        if (!serviceClassNames.isEmpty()) {
-            try {
-                writeServiceFile(serviceClassNames, "META-INF/kumuluzee/graphql/java.lang.Object");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
 
         Set<? extends Element> annotated = roundEnvironment.getElementsAnnotatedWith(GraphQLApplicationClass.class);
         Set<String> settingsClassNames = new HashSet<>();
