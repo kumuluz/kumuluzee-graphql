@@ -47,6 +47,7 @@ public class KumuluzConfigMapper implements ConfigurationSource {
         CONFIG_MAP.put(ConfigKey.SCHEMA_INCLUDE_DEFINITION, "kumuluzee.graphql.schema.include-schema-definition");
         CONFIG_MAP.put(ConfigKey.SCHEMA_INCLUDE_DIRECTIVES, "kumuluzee.graphql.schema.include-directives");
         CONFIG_MAP.put(ConfigKey.SCHEMA_INCLUDE_INTROSPECTION_TYPES, "kumuluzee.graphql.schema.include-introspection-types");
+        CONFIG_MAP.put(ConfigKey.ENABLE_METRICS, "kumuluzee.graphql.metrics.enabled");
 
         CONFIG_MAP_LIST.put("mp.graphql.hideErrorMessage", "kumuluzee.graphql.exceptions.hide-error-message");
         CONFIG_MAP_LIST.put("mp.graphql.showErrorMessage", "kumuluzee.graphql.exceptions.show-error-message");

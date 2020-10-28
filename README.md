@@ -357,6 +357,29 @@ For a more detailed example of kumuluzee-security integration check out the
 [kumuluzee-graphql-jpa-security](https://github.com/kumuluz/kumuluzee-samples/tree/master/kumuluzee-graphql-jpa-security)
 sample.
 
+## Integration with kumuluzee-metrics
+
+You can enable automatic metrics integration by setting the following configuration key (note that
+`kumuluzee-metrics-core` dependency must be present):
+
+```yaml
+kumuluzee:
+  graphql:
+    metrics:
+      enabled: true
+```
+
+This will add a counter and a timer to every query and mutation in the application. For a more fine grained control
+over metrics you can always use metrics annotations on your query/mutation methods. For example:
+
+```java
+@Query
+@Counted(name = "get_customer_counter")
+public Customer getCustomer(@Name("customerId") String customerId) {
+    return customerBean.getCustomer(customerId);
+}
+```
+
 ## Changelog
 
 Recent changes can be viewed on Github on the [Releases Page](https://github.com/kumuluz/kumuluzee-graphql/releases).
