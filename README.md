@@ -380,6 +380,48 @@ public Customer getCustomer(@Name("customerId") String customerId) {
 }
 ```
 
+## Integration with kumuluzee-bean-validation
+
+You can validate arguments to queries and mutations by enabling Bean Validation integration with the following
+configuration key (note that `kumuluzee-bean-validation-hibernate-validator` dependency must be present):
+
+```yaml
+kumuluzee:
+  graphql:
+    bean-validation:
+      enabled: true
+```
+
+Arguments in query and mutation methods will then be verified by bean validation implementation. For example:
+
+```java
+@Query
+public Customer getCustomer(@Name("customerId") @Pattern(regexp = "\\d+") String customerId) {
+    return customerBean.getCustomer(customerId);
+}
+```
+
+Another example:
+
+```java
+@Mutation
+public Customer addNewCustomer(@Name("customer") Customer customer) {
+    customerBean.saveCustomer(customer);
+    return customer;
+}
+
+// Customer.java:
+public class Customer {
+
+    // ...
+
+    @Size(min = 3, max = 15)
+    private String firstName;
+
+    // ...
+}
+```
+
 ## Changelog
 
 Recent changes can be viewed on Github on the [Releases Page](https://github.com/kumuluz/kumuluzee-graphql/releases).
