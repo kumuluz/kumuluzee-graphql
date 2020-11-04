@@ -92,7 +92,7 @@ public class GraphQLUIExtension implements Extension {
                 LOG.info("GraphQL UI registered on " + mapping + " (servlet context is implied).");
 
                 JettyServletServer server = (JettyServletServer) kumuluzServerWrapper.getServer();
-                server.registerServlet(GraphQLUIServlet.class, mapping);
+                server.registerServlet(GraphQLUIServlet.class, mapping + "/*");
 
                 LOG.info("GraphQL UI extension initialized.");
             } else {

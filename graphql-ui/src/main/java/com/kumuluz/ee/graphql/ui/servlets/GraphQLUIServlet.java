@@ -27,7 +27,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 
 /**
@@ -43,8 +45,6 @@ public class GraphQLUIServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
-
-        PrintWriter w = resp.getWriter();
 
         if (this.graphQlPath == null) {
             String contextPath = configurationUtil.get("kumuluzee.server.context-path").orElse("");
@@ -64,11 +64,11 @@ public class GraphQLUIServlet extends HttpServlet {
                 URI u = new URI(path);
 
                 if(u.isAbsolute()) {
-                    w.println("URL must be relative. Extension not initialized.");
+                    resp.getWriter().println("URL must be relative. Extension not initialized.");
                     return;
                 }
             } catch(Exception E) {
-                w.println("Malformed url: " + path + ". Extension not initialized.");
+                resp.getWriter().println("Malformed url: " + path + ". Extension not initialized.");
                 return;
             }
 
@@ -79,16 +79,36 @@ public class GraphQLUIServlet extends HttpServlet {
             graphQlPath = path;
         }
 
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/html/graphiql.html")))) {
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                if (line.contains("$PATH")) {
-                    line = line.replace("$PATH", graphQlPath);
-                }
-
-                w.println(line);
-            }
+        if (req.getPathInfo() == null) {
+            // no trailing slash, redirect to trailing slash in order to fix relative requests
+            resp.sendRedirect(req.getContextPath() + req.getServletPath() + "/");
+            return;
         }
+
+        if ("/main.js".equals(req.getPathInfo())) {
+            resp.setContentType("application/javascript");
+            // inject _kumuluzee_graphql_path variable into js
+            sendFile(resp, "main.js", "_kumuluzee_graphql_path = \"" + graphQlPath + "\";\n");
+        } else {
+            sendFile(resp, "index.html", null);
+        }
+    }
+
+    private void sendFile(HttpServletResponse resp, String file, String prepend) throws IOException {
+        InputStream in = this.getClass().getResourceAsStream("/html/" + file);
+        OutputStream out = resp.getOutputStream();
+
+        if (prepend != null) {
+            out.write(prepend.getBytes());
+        }
+
+        byte[] buf = new byte[10000];
+        int length;
+        while ((length = in.read(buf)) > 0) {
+            out.write(buf, 0, length);
+        }
+
+        in.close();
+        out.close();
     }
 }
