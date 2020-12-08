@@ -43,7 +43,7 @@
         <graphql-java-smallrye.version>15.0</graphql-java-smallrye.version>
         <microprofile-graphql.version>1.0.2</microprofile-graphql.version>
         <smallrye-graphql.version>1.0.14</smallrye-graphql.version>
-        <kumuluzee-config-mp.version>1.5.0-SNAPSHOT</kumuluzee-config-mp.version>
+        <kumuluzee-config-mp.version>1.4.1</kumuluzee-config-mp.version>
         <classgraph.version>4.8.39</classgraph.version>
 
         <testng.version>6.14.3</testng.version>
