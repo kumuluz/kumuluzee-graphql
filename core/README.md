@@ -1,6 +1,6 @@
 # KumuluzEE GraphQL
 
-[![Build Status](https://img.shields.io/travis/kumuluz/kumuluzee-graphql/master.svg?style=flat)](https://travis-ci.org/kumuluz/kumuluzee-graphql)
+![KumuluzEE CI](https://github.com/kumuluz/kumuluzee-graphql/workflows/KumuluzEE%20CI/badge.svg)
 
 > Kick-start your GraphQL server development.
 
