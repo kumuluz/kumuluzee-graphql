@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2014-2018 Kumuluz and/or its affiliates
+ *  Copyright (c) 2014-2017 Kumuluz and/or its affiliates
  *  and other contributors as indicated by the @author tags and
  *  the contributor list.
  *
@@ -18,21 +18,30 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+package com.kumuluz.ee.graphql.mp.utils;
 
-package com.kumuluz.ee.graphql.annotations;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.kumuluz.ee.loader.EeClassLoader;
 
 /**
- * GraphQLConfiguration annotation - enables application class to be scanned for adding custom contexts.
+ * Utilities when running in UberJAR.
  *
- * @author Domen Kajdic
- * @since 1.0.0
+ * @author Urban Malc
+ * @since 1.2.0
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface GraphQLApplicationClass {
+public class JarUtils {
+
+    /**
+     * Returns the name of the main jar when running in JAR. This needs to be in a separate class since
+     * {@link EeClassLoader} is not present in all deployments (e.g. exploded).
+     *
+     * @return Name of the main JAR.
+     */
+    public static String getMainJarName() {
+        // use EeClassLoader to locate main JAR since it is loaded from there
+        return new java.io.File(EeClassLoader.class.getProtectionDomain()
+                .getCodeSource()
+                .getLocation()
+                .getPath())
+                .getName();
+    }
 }

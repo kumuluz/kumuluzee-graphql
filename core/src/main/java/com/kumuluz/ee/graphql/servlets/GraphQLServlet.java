@@ -21,12 +21,12 @@
 
 package com.kumuluz.ee.graphql.servlets;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kumuluz.ee.common.dependencies.EeComponentType;
 import com.kumuluz.ee.common.runtime.EeRuntime;
 import com.kumuluz.ee.common.runtime.EeRuntimeComponent;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.graphql.GraphQLApplication;
-import com.kumuluz.ee.graphql.utils.JsonKit;
 import com.kumuluz.ee.graphql.utils.QueryParameters;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
@@ -89,7 +89,7 @@ public class GraphQLServlet extends HttpServlet {
         if (schema == null) {
             List<GraphQLApplication> applications = new ArrayList<>();
             ServiceLoader.load(GraphQLApplication.class).forEach(applications::add);
-            Class applicationClass;
+            Class<?> applicationClass;
             if (applications.size() == 1) {
                 applicationClass = applications.get(0).getClass();
             } else {
@@ -148,7 +148,7 @@ public class GraphQLServlet extends HttpServlet {
 
     private GraphQLSchema buildSchema() {
         final List<String> basePackages = new ArrayList<>(
-                Arrays.asList("com.kumuluz.ee.graphql.classes")
+                Collections.singletonList("com.kumuluz.ee.graphql.classes")
         );
 
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
@@ -197,7 +197,7 @@ public class GraphQLServlet extends HttpServlet {
     private void returnAsJson(HttpServletResponse response, ExecutionResult executionResult) throws IOException {
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_OK);
-        JsonKit.toJson(response, executionResult.toSpecification());
+        new ObjectMapper().writer().writeValue(response.getWriter(), executionResult.toSpecification());
     }
 
     private List<Class<?>> getResourceClasses() {
@@ -211,7 +211,7 @@ public class GraphQLServlet extends HttpServlet {
             while (scanner.hasNextLine()) {
                 String className = scanner.nextLine();
                 try {
-                    Class resourceClass = Class.forName(className);
+                    Class<?> resourceClass = Class.forName(className);
                     resourceClasses.add(resourceClass);
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();

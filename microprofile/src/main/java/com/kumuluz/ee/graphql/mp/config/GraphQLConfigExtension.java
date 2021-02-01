@@ -18,21 +18,36 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+package com.kumuluz.ee.graphql.mp.config;
 
-package com.kumuluz.ee.graphql.annotations;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.kumuluz.ee.common.ConfigExtension;
+import com.kumuluz.ee.common.config.EeConfig;
+import com.kumuluz.ee.common.dependencies.EeExtensionDef;
+import com.kumuluz.ee.common.dependencies.EeExtensionGroup;
+import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
+import com.kumuluz.ee.configuration.ConfigurationSource;
 
 /**
- * GraphQLConfiguration annotation - enables application class to be scanned for adding custom contexts.
+ * Registers {@link KumuluzConfigMapper} configuration extension.
  *
- * @author Domen Kajdic
- * @since 1.0.0
+ * @author Urban Malc
+ * @since 1.2.0
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface GraphQLApplicationClass {
+@EeExtensionDef(name = "GraphQLMP", group = EeExtensionGroup.CONFIG)
+public class GraphQLConfigExtension implements ConfigExtension {
+
+    @Override
+    public ConfigurationSource getConfigurationSource() {
+        return new KumuluzConfigMapper();
+    }
+
+    @Override
+    public void load() {
+
+    }
+
+    @Override
+    public void init(KumuluzServerWrapper kumuluzServerWrapper, EeConfig eeConfig) {
+
+    }
 }

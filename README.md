@@ -4,12 +4,17 @@
 
 > Kick-start your GraphQL server development.
 
-KumuluzEE GraphQL project enables you to easily create your own GraphQL server with a few simple annotations. Using 
+KumuluzEE GraphQL project enables you to easily create your own GraphQL server with a few simple annotations and is
+fully compliant with [MicroProfile GraphQL Sepcification](https://github.com/eclipse/microprofile-graphql). Using 
 this extension requires understanding of the basic GraphQL concepts.
 
 Read about GraphQL: [GraphQL](http://graphql.org/learn/).
 
-This project is built upon the [GraphQL Java implementation](https://github.com/graphql-java/graphql-java) and uses [GraphQL SPQR](https://github.com/leangen/graphql-spqr) extension for building schema from annotations. 
+This project is built upon the [SmallRye GraphQL implementation](https://github.com/smallrye/smallrye-graphql). 
+
+> **For 1.0.x users, see the following README: [kumuluzee-graphql](https://github.com/kumuluz/kumuluzee-graphql/tree/master/core)**
+>
+> For new users, using MicroProfile based implementation (this README) is recommended.
 
 ## Usage
 
@@ -17,533 +22,273 @@ You can enable KumuluzEE GraphQL by adding the following dependency to the proje
 ```xml
 <dependency>
     <groupId>com.kumuluz.ee.graphql</groupId>
-    <artifactId>kumuluzee-graphql</artifactId>
+    <artifactId>kumuluzee-graphql-mp</artifactId>
     <version>${kumuluzee-graphql.version}</version>
 </dependency>
 ```
 
 When KumuluzEE GraphQL is included in the project, you can start developing your GraphQL services.
 
-### GraphQL server configuration
-GraphQL server will be served on /graphql by default. You can change this with the KumuluzEE configuration framework by setting the following key:
-```yaml
-kumuluzee:
-  graphql:
-    mapping: /myCompanyGraphQL
-```
+### Registering GraphQL Resource 
 
-### Registering GraphQL application class
-For additional configutation, an application class can be created. It must extend `GraphQLApplication` and be annotated with annotation `GraphQLApplicationClass`. Inside that class configuration methods can be overridden. Currently these settings are supported:
-* custom contexts,
-* custom instrumentations,
-* custom execution strategies,
-* custom request caching with preparsed document provider,
-* custom execution id provider,
-* change endpoint to create GraphQL object per request (if you are using DataLoaders).
-
-If you are unfamiliar with these settings, you can read `graphql-java` [documentation](https://graphql-java.readthedocs.io/en/latest/index.html).
-
-### Registering GraphQL classes 
-
-The `@GraphQLClass` annotation must be used on the classes that define GraphQL related functions. All GraphQL 
-annotated functions in annotated classes will be added to your GraphQL schema.
+The `@GraphQLApi` annotation must be used on the classes that define GraphQL related functions (queries, mutations, etc.).
+All GraphQL annotated functions in annotated classes will be added to your GraphQL schema.
 
 ```java
-@GraphQLClass
-public class HelloWorld {...}
-```
-
-#### GraphQL schema generation
-
-When generating the GraphQL schema, the scanner will only process classes within the same package. What does that mean? Well, if your output class is located in 
-package `com.example` and it extends a base class, which is located in `com.example.common`, the scanner will only scan the `com.example` package).
-
-To fix this you have to provide a list of packages that should be scanned when building the GraphQL schema:
-
-```yaml
-graphql:
-  schema:
-    base-packages:
-      - com.example
-      - com.example.common
-      - org.example.impl
+@GraphQLApi
+public class CustomerResource {...}
 ```
 
 ### Defining GraphQL queries 
-The `@GraphQLQuery` annotation will register your Java function as a Query function in GraphQL. All types and 
-parameters will be automatically converted to GraphQL types and added to the schema. You can override the query name (which defaults to the function name) or add a description to the query.
+The `@Query` annotation will register your Java function as a Query function in GraphQL. All types and 
+parameters will be automatically converted to GraphQL types and added to the schema. You can override the query name
+(which defaults to the function name without `get` or `set` prefix) or add a description to the query.
 
 ```java
-@GraphQLClass
+@GraphQLApi
 public class HelloWorld {
-    @GraphQLQuery
+
+    @Query("helloWorld")
     public String hello() {
-        return "world";
+        return "Hello world!";
     }
     
-    @GraphQLQuery(name="somethingElse", desciption="Hello world function")
-    public String world(@GraphQLArgument(name="parameter") String parameter) {
-        return "hello";
+    @Query
+    @Name("greet")
+    @Description("Greets person.")
+    public String sayHello(String person) {
+        return "Hello " + person + "!";
     }
 }
 ```
 
 ### Defining GraphQL mutations
-The `@GraphQLMutation` annotation is used for defining mutations. It is used the same way as `@GraphQLQuery` annotation. 
+The `@Mutation` annotation is used for defining mutations. It is used the same way as `@Query` annotation. 
 The only difference is, that mutations are used for changing persistent state, while queries only retrieve data. 
 
 More information on this can be found in GraphQL documentation: [Queries and mutations](http://graphql.org/learn/queries/).
+
 ```java
-@GraphQLClass
-public class HelloWorld {
-    @GraphQLMutation
-    public String hello(@GraphQLArgument(name="world") String world) {
-        // save to database, perform mutation
-        return world;
+@GraphQLApi
+public class CustomerResource {
+
+    // ...
+
+    @Mutation
+    public Customer saveCustomer(Customer customer) {
+        return customerService.save(customer);
     }
     
-    @GraphQLMutation(name="somethingElse", desciption="Hello world function")
-    public String world(@GraphQLArgument(name="hello") String hello) {
-        // save to database, perform mutation
-        return hello;
+    @Mutation
+    @Name("saveOrder")
+    @Description("Saves the order to the database.")
+    public String newOrder(Order order) {
+        return orderService.save(order);
     }
 }
 ```
 
-### Defining GraphQL subscriptions
-Subscriptions are not supported at this time.
-
 ### Annotating GraphQL arguments
-The `@GraphQLArgument` annotation must be used for defining the arguments. It allows you to override argument's name, 
-add a description, a default value, or even a custom DefaultValueProvider.
+
+The name of GraphQL argument (on query or mutation) can be overridden with `@Name` annotation. It can also be marked as
+non-nullable with `@NonNull` annotation or assigned a default value with `@DefaultValue` annotation.
 
 ```java
-@GraphQLQuery
-public Integer number(@GraphQLArgument(name="number", defaultValue="0") Integer number) {
-    return number;
-}
-  
-@GraphQLQuery
-public String text(@GraphQLArgument(name="text", defaultValueProvider = SomeProvider.class) String text) {
-    return text;
+@Query
+public Integer getCustomerCount(@Name("onlyRegistered") Boolean registered) {
+    return customerService.getCustomerCount(registered);
 }
 ```
 
-> Avoid using primitive types as parameters (int, double...), because they cannot be `null`. If you use them, please provide their default values with this annotation or your application will crash if selected parameter will be missing from your query! It is recommended to use their wrapper classes instead (such as Integer, Double...).
+> Avoid using primitive types as parameters (int, double...), because they cannot be `null`. If you use them, please provide their default values with `@DefaultValue` annotation.
 
-Annotation can be omitted if you add -parameters to your javac compiler. You can use maven compiler plugin for that:
-```xml
-<plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-compiler-plugin</artifactId>
-    <version>${version}</version>
-    <configuration>
-        <compilerArgs>
-            <arg>-parameters</arg>
-        </compilerArgs>
-    </configuration>
-</plugin>
-```
+### Annotation `@Ignore`
 
-### Managing GraphQL input fields
-With the `@GraphQLInputField` annotation you can rename input fields and provide their descriptions. Annotation can 
-be used on a setter, a getter or on a field, but it is recommended to be used on setters only.
+This annotation can be used to ignore a certain field.
 ```java
-@GraphQLInputField(name="someField", description="Some description")
-public void randomFunctionName(String someField) {
-    this.someField = someField;
+public class Customer {
+    @Ignore
+    private String address;
 }
 ```
 
-### Annotation `@GraphQLIgnore`
-This annotation can be used to ignore a certain input/output field. If used on a getter, the field will not be 
-present in the output, if used on a setter, the field will not be present in the input.
-```java
-@GraphQLIgnore
-public String getField() {
-    return field;
-}
-```
+### Annotation `@NonNull`
 
-### Annotation `@GraphQLNonNull`
-If you want to mark a parameter as required, you can annotate the type with `@GraphQLNonNull` annotation. This works 
-both for input/output types (on getters or setters). It can be also used on lists: 
+If you want to mark a parameter as required, you can annotate the type with `@NonNull` annotation.
+It can be also used on lists: 
+
 ```java
 // non null list of non null students
-@GraphQLNonNull List<@GraphQLNonNull Student>
+@NonNull List<@NonNull Student>
 
-public @GraphQLNonNull String getField() {
-    return field;
-}
-  
-public void setField(@GraphQLNonNull String field) {
-    this.field = field;
-}
-
-@GraphQLMutation
-public String someMutation(@GraphQLNonNull @GraphQLArgument(name="field") String field) {
+@Mutation
+public String someMutation(@NonNull String field) {
   return field;
 } 
 ```
 
-### Annotation `@GraphQLContext`
-The `@GraphQLContext` annotation allows you to add a field to some object in the schema (for example if you get a field 
-from another source). The following example will add a field "newField" to TestType schema. You can access all the properties from the parent object and use them for fetching your data.
-```java
-@GraphQLQuery(name="newField")
-public String getNewField(@GraphQLContext TestType object) {
-    return someBean.getSomething(object.getField1());
-}
-```
-> It is recommended to use this when making nested queries. It is best to avoid writing logic in your JPA entities 
-and keep your classes clean. 
+### Annotation `@Source`
 
-
-### Annotation `@GraphQLEnvironment`
-This annotation is used to inject GraphQL-java related fields, which are contained inside ResolutionEnvironment. 
-It contains multiple objects such as DataFetchingEnvironment, schema, context etc. 
+The `@Source` annotation can be used to define a resolver function for additional fields. The example below adds a
+new field `referrer` (of type `String`) on the `Customer` type:
 
 ```java
-@GraphQLQuery
-public String test(@GraphQLEnvironment ResolutionEnvironment resolutionEnvironment) {
-    return resolutionEnvironment.toString();
-}
-```
- 
-
-### Annotating custom types
-If you use a custom type as a type in a query, you do not need to annotate it, if you provide default getters and 
-setters. If you change getter in any way (add parameter...), you need to annotate it with a `@GraphQLQuery` or your 
-field will not be registered to the schema. This happens because every field in GraphQL needs a resolver function. 
-Setters cannot really take any additional parameters, so the only option is to rename them. You can do that with 
-`@GraphQLInputField` annotation.
-
-```java
-@GraphQLClass
-public class HelloWorld {
-    @GraphQLQuery
-    public TestType test() {
-        TestType type = {...};
-        return type;
-    }
-}
-  
-  
-public class TestType {
-    private String field1;
-    private Integer field2;
+@GraphQLApi
+public class CustomerResource {
     
-    // annotation is not needed here
-    public String getField1() {
-        return field1;
-    }
+    @Name("referrer")
+    public String getReferrerForCustomer(@Source Customer customer) {
+        return refererApi.getReferer(customer);
+    }   
+}
+```
+
+The `@Source` annotation can also be used to resolve fields in batches. This is commonly referred to as the dataloader
+pattern and is used to solve the N+1 problem. The following example would generate exactly the same schema as the example
+above. The only difference is that in the example above the method is called once for every customer returned and in the
+following example the method is called once for all customers that are returned.
+
+```java
+@GraphQLApi
+public class CustomerResource {
     
-    // annotation is needed here, name must be specified
-    @GraphQLQuery(name="field2")
-    public Integer getField2(@GraphQLArgument(name="parameter") Integer parameter) {
-        return field2 + 123;
-    }
+    @Name("referrer")
+    public List<String> getReferrerForCustomer(@Source List<Customer> customers) {
+        return refererApi.getReferersForMultipleCustomers(customers);
+    }   
+}
+```
+
+Another use of the `@Source` annotation is defining nested queries on types. For example:
+
+```java
+@GraphQLApi
+public class CustomerResource {
     
-    // annotation is not needed here
-    public void setField1(String field1) {
-        this.field1 = field1;
-    }
+    @Name("paidOrders")
+    public List<Order> getPaidOrders(@Source Customer customer) {
+        return customer.getOrders().stream()
+                    .filter(o -> o.isPaid()).collect(Collectors.toList());
+    }   
+}
+```
+
+Nested queries can also be batched (dataloader pattern). This will generate the same schema (and functionality) as the
+example above:
+
+```java
+@GraphQLApi
+public class CustomerResource {
     
-    // annotation is needed here, name must be specified
-    @GraphQLInputField(name="field2")
-    public void setField2withChangedName(String field2) {
-        this.field2 = field2 + 123;
-    }
+    @Name("paidOrders")
+    public List<List<Order>> getPaidOrders(@Source List<Customer> customers) {
+        return customers.stream.map(c -> c.getOrders().stream()
+                        .filter(o -> o.isPaid()).collect(Collectors.toList()))
+                    .collect(Collectors.toList());
+    }   
 }
 ```
 
-You also need to add empty constructor, if you are using that type as input in a Mutation.
-```java
-@GraphQLClass
-public class SomeClass {
-    @GraphQLMutation
-    public TestType test(@GraphQLArgument(name="input") TestType t) {
-        // save to database
-        return t;
-    }
-}
-  
-  
-public class TestType {
-    {...}
-    private List<String> someList;
-    
-    public TestType() {
-        // can also perform actions such as creating empty lists, 
-        // to prevent them from being null (if not passed to Mutation)
-        someList = new ArrayList<>(); 
-    }
-}
-```
-## Using GraphQLUtils for pagination, sorting and filtering
-The GraphQLUtils class has a number of functions for advanced GraphQL operations, such as agination, sorting and filtering. 
-The main function is GraphQLUtils.process(). It takes your ```List<YourType>``` as a parameter with optional 
-parameters of classes Sort, Pagination and Filter which represent user input. Changing your output type from 
-```List<YourType>``` to ```PaginationWrapper<YourType>``` is also required in order to request pagination details when querying.
+### Error handling
 
-Example usage (taken from the sample project):
-```java
-// without pagination
-@GraphQLQuery
-public List<Student> allStudents() {
-    return facultyBean.getStudentList();
-}
-  
-// with pagination --> parameters are optional, but recommended to use
-@GraphQLQuery
-public PaginationWrapper<Student> allStudents(@GraphQLArgument(name="pagination") Pagination pagination, @GraphQLArgument(name="sort") Sort sort, @GraphQLArgument(name="filter") Filter filter) {
-    return GraphQLUtils.process(facultyBean.getStudentList(), pagination, sort, filter);
-}
-```
-Example GraphQL query:
-```
-# without pagination
-{ 
-  allStudents {
-    studentNumber
-    name
-    suername
-  }
-}
-  
-# with pagination
-{
-  allStudents(pagination: {offset: 0, limit: 10}, sort: {fields: [{field: "studentNumber", order: ASC}]}) {
-    result {
-      studentNumber
-      name
-      surname
-    }
-    pagination {
-      offset
-      limit
-      total
-    }
-  }
-}
-```
-Arguments must match in name (if you add Pagination pagination as user input, you need to use name pagination when querying).
+Exceptions can be thrown during query/mutation execution. The response will have the structure of the GraphQL error as
+defined in the GraphQL specification.
 
-### Pagination structure
-The `PaginationWrapper` wraps your list with the pagination object (of type Pagination) and result list (your original 
-list). PaginationInput type has two fields: offset and limit, while the PaginationOutput adds field total (available 
-when querying).
-
-Example GraphQL query:
-```
-someFunctionName(pagination: 
-    {
-        offset: 0, 
-        limit: 10
-    }
-)
-```
-
-
-### Sorting structure
-Sort object contains a list of `SortField`. Each `SortField` contains two fields: field and order (ASC or DESC). 
-When querying, fields are processed in the same order as they are passed. Sorting works natively on types: Integer, Double, Float, String and Date. If your field is of another type, the comparison will default to String comparison.
-
-Example GraphQL query:
-```
-someFunctionName(sort: { 
-    fields: [
-        {
-            field: "assistant.popularity", 
-            order: DESC
-        },
-        {
-            field: "surname", 
-            order: ASC
-        }
-    ]
-})
-```
-
-### Filtering structure
-Filter object contains a list of `FilterField`. Each `FilterField` contains four fields: op (operator), field, value and type.
-Following operators are supported:
-* EQ | Equals
-* EQIC | Equals ignore case
-* NEQ | Not equal
-* NEQIC | Not equal ignoring case
-* LIKE | Pattern matching (regex search)
-* LIKEIC | Pattern matching ignore case (regex search)
-* GT | Greater than
-* GTE | Greater than or equal
-* LT | Lower than
-* LTE | Lower than or equal
-* IN | In set
-* INIC | In set ignore case
-* NIN | Not in set
-* NINIC | Not in set ignore case
-* ISNULL | Null
-* ISNOTNULL | Not null
-
-Most operations work on types Integer, Double, Float, String and Date (must be passed in ISO-8601 format), while ignoring case operations (IC) only work on String.
-Type needs to be passed when filtering (if not, defaults to STRING), because the value field is string and needs to be casted to the right type in order to perform comparisons.
-
-Example GraphQL query:
-```
-someFunctionName(filter: {
-    fields: [
-        {
-            op: LIKE, 
-            field: "classroom", 
-            value: "P.*"
-        }, 
-        {
-            op: INIC, 
-            field: "lecturer.assistant.name", 
-            value: "[Bradley,scott]"
-        }, 
-        {
-            op: NEQ,
-            field: "lecturer.assistant.popularity", 
-            type: DOUBLE, 
-            value: "10"
-        }
-    ]
-})
-```
-
-### GraphQLUtils JPA integration
-`GraphQLUtils` fully supports `JPAUtils` from te [kumuluzee-rest](https://github.com/kumuluz/kumuluzee-rest) 
-extension. `JPAUtils` optimize database requests, querying only the objects that are specified with the 
-paginarion, sort and filter input fields. You can use the `GraphQLUtils` to automatically wrap the calls for you, or 
-call `JPAUtils` manually.
-
-#### GraphQLUtils calls JPAUtils
-This is the easier option. Just call function GraphQLUtils.process(), pass an `EntityManager` instance and your 
-Class + pagination/sort/filter structures. The function returns PaginationWrapper<Type>. If you do not want any metadata, you
- can call getResult() on wrapper object to get List<Type>.
-```java
-public PaginationWrapper<Student> getStudents(Pagination pagination, Sort sort, Filter filter) {
-    return GraphQLUtils.process(em, Student.class, pagination, sort, filter);
-}
-```
-
-#### Manual JPAUtils call
-If you do not want `GraphQLUtils` to do the processing, you can call `JPAUtils` manually (`GraphQLUtils` calls function 
-JPAUtils.queryEntities). Before doing that, please read [kumuluzee-rest](https://github.com/kumuluz/kumuluzee-rest) documentation.
-`GraphQLUtils` has a few helper functions which you can use:
-- queryParameters (converts Pagination, Sort and Filter classes to QueryParameters required for JPAUtils calls),
-- wrapList (wraps List to PaginationWrapper; you need to pass number of items manually in order to get total field when querying or not pass them at all, which results in `null` field)
-
-```java
-public PaginationWrapper<Subject> getSubjectList(Pagination pagination, Sort sort, Filter filter) {
-    QueryParameters queryParameters = GraphQLUtils.queryParameters(pagination, sort, filter);
-    List<Subject> subjectList = JPAUtils.queryEntities(em, Subject.class, queryParameters);
-    Long count = JPAUtils.queryEntitiesCount(em, Subject.class, queryParameters);
-    return GraphQLUtils.wrapList(subjectList, pagination, count.intValue());
-    //return GraphQLUtils.wrapList(subjectList, pagination);
-}
-``` 
-
-#### Optimize JPA queries 
-You can further optimize queries by providing `ResolutionEnvironment` to process or processWithoutPagination function.
-`GraphQLUtils` will then extract the fields you queried and made sure, that only these fields will be present in the JPA query.
-
-```java
-@GraphQLQuery
-public List<Assistant> allAssistants(@GraphQLArgument(name="sort") Sort sort, @GraphQLEnvironment ResolutionEnvironment resolutionEnvironment) {
-    return GraphQLUtils.processWithoutPagination(em, Assistant.class, resolutionEnvironment, sort);
-}
-```
-ResolutionEnvironment is injected with the `@GraphQLEnvironment` annotation and is always the third parameter of the 
-function behind the `EntityManager` and class.
-
-> Optimization is not enabled by default, because it is an experimental feature. 
-If you have any problems, please submit a bug report.
-
-### Settings defaults
-Defaults can be set in config file:
+By default, all messages from unchecked exceptions will be hidden for security reasons. You can override this behavior
+with the configuration key `kumuluzee.graphql.exceptions.show-error-message`. The message will be replaced with
+`Server Error` and can be set using the configuration key `kumuluzee.graphql.exceptions.default-error-message`.
+By default, all messages from checked exceptions will be shown. You can hide messages from exceptions with the
+configuration key `kumuluzee.graphql.exceptions.hide-error-message`. Example configuration:
 
 ```yaml
 kumuluzee:
   graphql:
-    defaults:
-      offset: 0
-      limit: 20
-```
-Settings default to offset 0 and limit 20.
-
-### Using sorting/filtering without pagination
-If your entity does not need pagination, you can call `GraphQLUtils` function processWithoutPagination().
-Function accepts your list as parameter and Sort or Filter object, while returning the same type of list.
-JPA version is also supported (you need to pass EntityManager and Class + Sort and/or Filter object).
-
-```java
-@GraphQLQuery 
-public List<Student> allStudents(@GraphQLArgument(name="sort") Sort sort) {
-    return GraphQLUtils.processWithoutPagination(facultyBean.getStudentList(), sort);
-}
+    exceptions:
+      hide-error-message:
+        - com.example.exceptions.HiddenCheckedException
+      show-error-message:
+        - com.example.exceptions.ShownRuntimeException
+      default-error-message: Server error, for more information contact ustomer service.
 ```
 
 ## Querying GraphQL endpoint
-This part will explain how to query your graphql endpoint.
-In most cases, you need to pass three things:
-- query
-- OperationName
-- variables
- 
-There are a number of supported ways:
 
-### Using HTTP GET
-You can pass the following parameters as get parameters. 
-If you will only pass one query, you can omit naming and operationName.
-Variables are also optional if you do not use them in your query.
-```
-HTTP GET localhost:8080/graphql?operationName=query1&variables={}&query=query query1 { allStudents { result { name surname } } }
-HTTP GET localhost:8080/graphql?&query= { allStudents { result { name surname } } }
-```
-
-### Using HTTP POST
-This is almost the same as the above method with get request. The only difference is passing parameters in body as JSON.
+GraphQL endpoint (`/graphql`) should be queried using a POST request. Request body should be a JSON object containing
+field `query` with the query that should be excecuted and optionally a field `variables` containing a map of GraphQL
+variables. For example:
 ```json
 HTTP POST localhost:8080/graphql
 Header: Content-Type: application/json
 Post data: 
 {
-	"query": "query query1 { allStudents { result { name surname } } }",
-	"operationName": "query1",
-	"variables": {}
+	"query": "{customers {id, name, orders {id, total}}}",
+	"variables": {"myVariable": "someValue"}
 }
 ```
 
-Optional parameters can also be omitted here.
+### Querying GraphQL schema
 
-### Using HTTP POST with different Content-Type
-You can also use a application/graphql as content type. 
-If that header is present, the post body will be treated as graphql query string.
+GraphQL schema generated from annotations can be accessed by sending a GET request on `/graphql/schema.graphql`
+endpoint. By default, some elements from the schema are omitted for readability. Additional information can be added to
+schema by setting the following configuration keys to `true`:
 
-```
-HTTP POST localhost:8080/graphql
-Header: Content-Type: application/graphql
-Post data: 
-query query1 { 
-  allStudents { 
-    result { 
-      name 
-      surname 
-    } 
-  } 
-} 
+```yaml
+kumuluzee:
+  graphql:
+    schema:
+      include-scalars: true
+      include-schema-definition: true
+      include-directives: true
+      include-introspection-types: true
 ```
 
-### Priority
-If you send a post request and add get parameters, get parameters will be prioritized.
+### GraphQL endpoint mapping
 
-## Adding GraphiQL (a GraphQL UI)
+GraphQL server and schema will be served on `/graphql/` by default. You can change this with the KumuluzEE configuration
+framework by setting the following key:
 
-GraphiQL is a tool, which helps you to test your graphql endpoint. 
-It is like Postman for graphql.
-You write your query, parameters and graphiql will send the request. 
+```yaml
+kumuluzee:
+  graphql:
+    mapping: customers-api
+```
+
+## Annotation scanning for GraphQL schema generation
+
+By default KumuluzEE GraphQL uses optimized scanning in order to reduce startup times. This means that only the main
+application JAR will be scanned (main artifact). In order to scan additional artifacts you need to specify them using
+the [scan-libraries mechanism](https://github.com/kumuluz/kumuluzee/pull/123). You need to include all dependencies
+which contain GraphQL resources (annotated with `@GraphQLApi`) as well as dependencies containing models returned from
+GraphQL resources.
+If all your models and resources are in the main artifact you don't need to include anything. For example to include
+_my-models_ artifact use the following configuration:
+
+```yaml
+kumuluzee:
+  dev:
+    scan-libraries:
+      - my-models
+```
+
+If you are not sure if your configuration is correct you can try disabling scanning optimization. This will scan all
+dependencies but will drastically increase application startup time. Having this optimization disabled in production is not
+recommended. Disable optimized scanning by using the following configuration:
+
+```yaml
+kumuluzee:
+  graphql:
+    scanning:
+      optimize: false
+```
+
+You can also enable scan debugging by setting the following key to `true`: `kumuluzee.graphql.scanning.debug`. This
+will output a verbose log of scanning configuration and progress.
+
+## Adding Graph*i*QL (a GraphQL UI)
+
+Graph*i*QL is a querying tool for GraphQL application. 
+It is the Postman equivalent for GraphQL.
+You write your query, parameters and Graph*i*QL will send the request. 
 It also checks your query syntax and allows you to explore your schema graphically.
 More information can be found [here](https://github.com/graphql/graphiql).
 
@@ -557,21 +302,131 @@ If you want to include GraphiQL to your project, include the following dependenc
 </dependency>
 ```
 
-Dependency will include GraphiQL UI artifacts. If dependency is included to your project, GraphiQL will be disabled in production environment and enabled in all others. If you want to explicitly enable or disable it, you can do so in the configuration file. After startup GraphQL UI is available at `http://localhost:8080/graphiql`(default). This setting can also be changed with key `kumuluzee.graphql.ui.mapping` in configuration.
+By default, Graph*i*QL will be accessible on `/graphiql` endpoint. You can configure the mapping or disable Graph*i*QL
+with KumuluzEE Configuration framework. Example configuration:
 
 ```yaml
 kumuluzee:
   graphql:
     ui:
-      mapping: /myUI
-      enabled: true/false
+      mapping: /api-ui
+      enabled: false
 ```
 
+## Using kumuluzee-security on GraphQL queries
+
+You can use [kumuluzee-security](https://github.com/kumuluz/kumuluzee-security) extension to secure GraphQL queries and
+mutations with familiar annotations `@RolesAllowed`, `@PermitAll`, etc. In order to start using kumuluzee-security first
+create a class that extends `GraphQLApplication` class and annotate it with `@GraphQLApplication` and `@DeclareRoles`.
+For example:
+
+```java
+@GraphQLApplicationClass
+@DeclareRoles({"user", "admin"})
+public class CustomerApp extends GraphQLApplication {
+}
+```
+
+Then secure a class annotated with `@GraphQLApi` by adding `@Secure` annotation. You can then proceed to use the
+standard `@DenyAll`, `@PermitAll` and `@RolesAllowed` annotations. For example:
+
+```java
+@RequestScoped
+@GraphQLApi
+@Secure
+public class CustomerResource {
+
+    @Inject
+    private CustomerService customerBean;
+
+    @Query
+    @PermitAll
+    public List<Customer> getAllCustomers() {
+       return customerBean.getCustomers();
+    }
+
+    @Query
+    @RolesAllowed({"user", "admin"})
+    public Customer getCustomer(@Name("customerId") String customerId) {
+        return customerBean.getCustomer(customerId);
+    }
+}
+```
+
+For a more detailed example of kumuluzee-security integration check out the
+[kumuluzee-graphql-jpa-security](https://github.com/kumuluz/kumuluzee-samples/tree/master/kumuluzee-graphql-jpa-security)
+sample.
+
+## Integration with kumuluzee-metrics
+
+You can enable automatic metrics integration by setting the following configuration key (note that
+`kumuluzee-metrics-core` dependency must be present):
+
+```yaml
+kumuluzee:
+  graphql:
+    metrics:
+      enabled: true
+```
+
+This will add a counter and a timer to every query and mutation in the application. For a more fine grained control
+over metrics you can always use metrics annotations on your query/mutation methods. For example:
+
+```java
+@Query
+@Counted(name = "get_customer_counter")
+public Customer getCustomer(@Name("customerId") String customerId) {
+    return customerBean.getCustomer(customerId);
+}
+```
+
+## Integration with kumuluzee-bean-validation
+
+You can validate arguments to queries and mutations by enabling Bean Validation integration with the following
+configuration key (note that `kumuluzee-bean-validation-hibernate-validator` dependency must be present):
+
+```yaml
+kumuluzee:
+  graphql:
+    bean-validation:
+      enabled: true
+```
+
+Arguments in query and mutation methods will then be verified by bean validation implementation. For example:
+
+```java
+@Query
+public Customer getCustomer(@Name("customerId") @Pattern(regexp = "\\d+") String customerId) {
+    return customerBean.getCustomer(customerId);
+}
+```
+
+Another example:
+
+```java
+@Mutation
+public Customer addNewCustomer(@Name("customer") Customer customer) {
+    customerBean.saveCustomer(customer);
+    return customer;
+}
+
+// Customer.java:
+public class Customer {
+
+    // ...
+
+    @Size(min = 3, max = 15)
+    private String firstName;
+
+    // ...
+}
+```
 
 ## Changelog
 
-Recent changes can bwebappewed on Github on the [Releases Page](https://github.com/kumuluz/kumuluzee-graphql/releases).
+Recent changes can be viewed on Github on the [Releases Page](https://github.com/kumuluz/kumuluzee-graphql/releases).
 
+> **For 1.0.x users, see the following README: [kumuluzee-graphql](https://github.com/kumuluz/kumuluzee-graphql/tree/master/core)**
 
 ## Contribute
 

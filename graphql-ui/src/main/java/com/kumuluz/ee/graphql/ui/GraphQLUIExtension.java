@@ -46,30 +46,53 @@ public class GraphQLUIExtension implements Extension {
     public void load() {
     }
 
+    private boolean checkRequirements() {
+
+        boolean graphqlFound = false;
+        try {
+            Class.forName("com.kumuluz.ee.graphql.GraphQLExtension");
+            graphqlFound = true;
+        } catch (ClassNotFoundException ignored) {
+        }
+        try {
+            Class.forName("com.kumuluz.ee.graphql.mp.GraphQLExtension");
+            graphqlFound = true;
+        } catch (ClassNotFoundException ignored) {
+        }
+
+        if (!graphqlFound) {
+            LOG.severe("Unable to find GraphQL extension, GraphQL UI will not be initialized.");
+        }
+
+        return graphqlFound;
+    }
+
     @Override
     public void init(KumuluzServerWrapper kumuluzServerWrapper, EeConfig eeConfig) {
         if (kumuluzServerWrapper.getServer() instanceof JettyServletServer) {
             LOG.info("Initializing GraphQL UI extension.");
             ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
 
-            try {
-                Class.forName("com.kumuluz.ee.graphql.GraphQLExtension");
-            } catch (ClassNotFoundException e) {
-                LOG.severe("Unable to find GraphQL extension, GraphQL UI will not be initialized: " + e.getMessage());
+            if (!checkRequirements()) {
                 return;
             }
 
-            boolean production = configurationUtil.get("kumuluzee.env.name").orElse("dev").equals("production");
-            if(configurationUtil.getBoolean("kumuluzee.graphql.ui.enabled").orElse(!production)) {
-                String mapping = configurationUtil.get("kumuluzee.graphql.ui.mapping").orElse("/graphiql");
-                if(mapping.charAt(0) != '/') {
-                    mapping = '/' + mapping;
+            if(configurationUtil.getBoolean("kumuluzee.graphql.ui.enabled").orElse(true)) {
+                String mapping = configurationUtil.get("kumuluzee.graphql.ui.mapping").orElse("graphiql");
+
+                // strip "/"
+                while (mapping.startsWith("/")) {
+                    mapping = mapping.substring(1);
                 }
+                while (mapping.endsWith("/")) {
+                    mapping = mapping.substring(0, mapping.length() - 1);
+                }
+                mapping = "/" + mapping;
 
                 LOG.info("GraphQL UI registered on " + mapping + " (servlet context is implied).");
 
                 JettyServletServer server = (JettyServletServer) kumuluzServerWrapper.getServer();
-                server.registerServlet(GraphQLUIServlet.class, mapping);
+                server.registerServlet(GraphQLUIServlet.class, mapping + "/*");
 
                 LOG.info("GraphQL UI extension initialized.");
             } else {

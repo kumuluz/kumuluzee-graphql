@@ -18,7 +18,6 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.kumuluz.ee.graphql.utils;
 
 import graphql.GraphQLException;
@@ -50,7 +49,7 @@ public class MethodSelector {
         }
         try {
             if (split.length > 1) {
-                Class current = o1.getClass();
+                Class<?> current = o1.getClass();
                 for (int i = 0; i < split.length; i++) {
                     String s = split[i];
                     methodName = "get" + s.substring(0, 1).toUpperCase() + s.substring(1);
@@ -96,35 +95,3 @@ public class MethodSelector {
         return o2;
     }
 }
-
-
-/* original code
-String[] split = field.getField().split("\\.");
-Method m = null;
-String methodName = null;
-Object o1 = t;
-Object o2 = t1;
-if (split.length > 1) {
-    Class current = t.getClass();
-    for (int i = 0; i < split.length; i++) {
-        String s = split[i];
-        methodName = "get" + s.substring(0, 1).toUpperCase() + s.substring(1);
-        m = current.getMethod(methodName);
-        if (m.getReturnType().equals(java.util.List.class)) {
-            throw new GraphQLException("Unable to sort on a list.");
-        } else {
-            if (i != split.length - 1) {
-                o1 = m.invoke(o1);
-                o2 = m.invoke(o2);
-                current = o1.getClass();
-            }
-        }
-    }
-} else {
-    methodName = "get" + field.getField().substring(0, 1).toUpperCase() + field.getField().substring(1);
-    m = t.getClass().getMethod(methodName);
-    if(m.getReturnType().equals(java.util.List.class)) {
-        throw new GraphQLException("Unable to sort on a list.");
-    }
-}
-*/

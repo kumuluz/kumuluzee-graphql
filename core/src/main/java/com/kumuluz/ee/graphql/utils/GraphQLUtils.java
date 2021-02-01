@@ -18,7 +18,6 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.kumuluz.ee.graphql.utils;
 
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
@@ -29,17 +28,11 @@ import com.kumuluz.ee.rest.beans.QueryParameters;
 import com.kumuluz.ee.rest.enums.FilterOperation;
 import com.kumuluz.ee.rest.enums.OrderDirection;
 import com.kumuluz.ee.rest.utils.JPAUtils;
-
 import graphql.GraphQLException;
-import graphql.language.*;
 import graphql.schema.DataFetchingEnvironment;
-import graphql.schema.DataFetchingFieldSelectionSet;
 import io.leangen.graphql.execution.ResolutionEnvironment;
 
 import javax.persistence.EntityManager;
-import javax.persistence.metamodel.Attribute;
-import javax.persistence.metamodel.EntityType;
-import javax.persistence.metamodel.Metamodel;
 import java.lang.reflect.Method;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;

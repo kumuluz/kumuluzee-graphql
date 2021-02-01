@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2014-2018 Kumuluz and/or its affiliates
+ *  Copyright (c) 2014-2017 Kumuluz and/or its affiliates
  *  and other contributors as indicated by the @author tags and
  *  the contributor list.
  *
@@ -18,34 +18,32 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.kumuluz.ee.graphql;
+package com.kumuluz.ee.graphql.mp;
 
 import com.kumuluz.ee.common.Extension;
 import com.kumuluz.ee.common.config.EeConfig;
-import com.kumuluz.ee.common.dependencies.EeComponentDependency;
-import com.kumuluz.ee.common.dependencies.EeComponentType;
-import com.kumuluz.ee.common.dependencies.EeExtensionDef;
-import com.kumuluz.ee.common.dependencies.EeExtensionGroup;
-import com.kumuluz.ee.common.exceptions.KumuluzServerException;
+import com.kumuluz.ee.common.dependencies.*;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
-import com.kumuluz.ee.graphql.servlets.GraphQLServlet;
 import com.kumuluz.ee.jetty.JettyServletServer;
+import io.smallrye.graphql.servlet.ExecutionServlet;
+import io.smallrye.graphql.servlet.SchemaServlet;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
 /**
- * GraphQLExtension class - hook-up GraphQLServlet class to expose api.
+ * KumuluzEE MicroProfile GraphQL extension, implemented by SmallRye.
  *
- * @author Domen Kajdic
- * @since 1.0.0
+ * @author Urban Malc
+ * @since 1.2.0
  */
-@EeExtensionDef(name = "GraphQL", group = EeExtensionGroup.GRAPHQL)
-@EeComponentDependency(EeComponentType.SERVLET)
+@EeExtensionDef(name = "MicroProfileGraphQL", group = EeExtensionGroup.GRAPHQL)
+@EeComponentDependencies({
+        @EeComponentDependency(EeComponentType.SERVLET),
+        @EeComponentDependency(EeComponentType.JSON_B),
+        @EeComponentDependency(EeComponentType.CDI),
+})
 public class GraphQLExtension implements Extension {
 
     private static final Logger LOG = Logger.getLogger(GraphQLExtension.class.getName());
@@ -60,20 +58,22 @@ public class GraphQLExtension implements Extension {
 
     @Override
     public void load() {
-        List<GraphQLApplication> applications = new ArrayList<>();
-        ServiceLoader.load(GraphQLApplication.class).forEach(applications::add);
-        if(applications.size() > 1) {
-            throw new KumuluzServerException("Found multiple declarations of GraphQLApplication. Please only provide one.");
+        try {
+            Class.forName("com.kumuluz.ee.config.microprofile.MicroprofileConfigExtension");
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("Could not find KumuluzEE Config MP dependency, required by " +
+                    "KumuluzEE GraphQL extension. " +
+                    "Please add it as a dependency: https://github.com/kumuluz/kumuluzee-config-mp");
         }
     }
 
     @Override
     public void init(KumuluzServerWrapper kumuluzServerWrapper, EeConfig eeConfig) {
         if (kumuluzServerWrapper.getServer() instanceof JettyServletServer) {
-            LOG.info("Initializing GraphQL extension.");
+            LOG.info("Initializing GraphQL MP extension.");
             ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
 
-            String path = configurationUtil.get("kumuluzee.graphql.mapping").orElse("/graphql");
+            String path = configurationUtil.get("kumuluzee.graphql.mapping").orElse("graphql");
             try {
                 URI u = new URI(path);
 
@@ -86,15 +86,20 @@ public class GraphQLExtension implements Extension {
                 return;
             }
 
-            if (path.charAt(0) != '/') {
-                path = '/' + path;
+            // strip "/"
+            while (path.startsWith("/")) {
+                path = path.substring(1);
+            }
+            while (path.endsWith("/")) {
+                path = path.substring(0, path.length() - 1);
             }
 
             JettyServletServer server = (JettyServletServer) kumuluzServerWrapper.getServer();
-            server.registerServlet(GraphQLServlet.class, path);
+            server.registerServlet(SchemaServlet.class, "/" + path + "/schema.graphql");
+            server.registerServlet(ExecutionServlet.class, "/" + path + "/*");
 
-            LOG.info("GraphQL registered on " + path + " (servlet context is implied).");
-            LOG.info("GraphQL extension initialized.");
+            LOG.info("GraphQL MP registered on /" + path + " (servlet context is implied).");
+            LOG.info("GraphQL MP extension initialized.");
         }
     }
 }

@@ -37,18 +37,15 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.leangen.graphql</groupId>
-            <artifactId>spqr</artifactId>
+            <version>${graphql-java-legacy.version}</version>
         </dependency>
         <dependency>
             <groupId>com.kumuluz.ee.rest</groupId>
             <artifactId>kumuluzee-rest-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.leangen.graphql</groupId>
+            <artifactId>spqr</artifactId>
         </dependency>
     </dependencies>
 </project>

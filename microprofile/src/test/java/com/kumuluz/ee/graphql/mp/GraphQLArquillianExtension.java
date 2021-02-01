@@ -18,21 +18,21 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+package com.kumuluz.ee.graphql.mp;
 
-package com.kumuluz.ee.graphql.annotations;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.jboss.arquillian.container.test.spi.client.deployment.AuxiliaryArchiveAppender;
+import org.jboss.arquillian.core.spi.LoadableExtension;
 
 /**
- * GraphQLConfiguration annotation - enables application class to be scanned for adding custom contexts.
+ * Registers library appender with Arquillian.
  *
- * @author Domen Kajdic
- * @since 1.0.0
+ * @author Urban Malc
+ * @since 1.2.0
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface GraphQLApplicationClass {
+public class GraphQLArquillianExtension implements LoadableExtension {
+
+    @Override
+    public void register(ExtensionBuilder extensionBuilder) {
+        extensionBuilder.service(AuxiliaryArchiveAppender.class, GraphQLLibraryAppender.class);
+    }
 }
