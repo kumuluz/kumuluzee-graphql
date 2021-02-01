@@ -88,9 +88,9 @@ public class GraphQLUtils<T> {
         if(offset > count) {
             return new PaginationWrapper<T>(output, new ArrayList<>());
         } else if(offset + limit > count) {
-            limit = count;
+            return new PaginationWrapper<T>(output, list.subList(offset, count));
         }
-        return new PaginationWrapper<T>(output, list.subList(offset, limit));
+        return new PaginationWrapper<T>(output, list.subList(offset, offset + limit));
     }
 
     public static <T> List<T> processWithoutPagination(List<T> l, Sort s, Filter f) {
