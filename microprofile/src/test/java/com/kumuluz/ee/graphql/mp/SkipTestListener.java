@@ -36,15 +36,17 @@ import java.util.Arrays;
 public class SkipTestListener implements IInvokedMethodListener {
 
     private static final String[] SKIP_TESTS = {
-            "createNewNullNamedTeam" // https://github.com/smallrye/smallrye-graphql/pull/292
+            "testJsonDefault"
     };
 
     private static final String SKIP_ATTRIBUTE = "KUMULUZEE_SKIP_TEST";
 
     @Override
     public void beforeInvocation(IInvokedMethod method, ITestResult testResult) {
-        TestData td = getExecutionTestData(testResult.getParameters());
-        if (td != null && Arrays.stream(SKIP_TESTS).anyMatch(s -> s.equals(td.getName()))) {
+        TestData tdE = getExecutionTestData(testResult.getParameters());
+        org.eclipse.microprofile.graphql.tck.dynamic.schema.TestData tdS = getSchemaTestData(testResult.getParameters());
+        if (tdE != null && Arrays.stream(SKIP_TESTS).anyMatch(s -> s.equals(tdE.getName())) ||
+                tdS != null && Arrays.stream(SKIP_TESTS).anyMatch(s -> s.equals(tdS.getHeader()))) {
             testResult.setAttribute(SKIP_ATTRIBUTE, true);
         }
     }
@@ -63,6 +65,15 @@ public class SkipTestListener implements IInvokedMethodListener {
         for (Object param : parameters) {
             if (param instanceof TestData) {
                 return (TestData) param;
+            }
+        }
+        return null;
+    }
+
+    private org.eclipse.microprofile.graphql.tck.dynamic.schema.TestData getSchemaTestData(Object[] parameters) {
+        for (Object param : parameters) {
+            if (param instanceof org.eclipse.microprofile.graphql.tck.dynamic.schema.TestData) {
+                return (org.eclipse.microprofile.graphql.tck.dynamic.schema.TestData) param;
             }
         }
         return null;
