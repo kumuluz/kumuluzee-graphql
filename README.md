@@ -194,7 +194,7 @@ public class CustomerResource {
 Exceptions can be thrown during query/mutation execution. The response will have the structure of the GraphQL error as
 defined in the GraphQL specification.
 
-By default, all messages from unchecked exceptions will be hidden for security reasons. You can override this behavior
+By default, all messages from unchecked exceptions (except some defaults, see below) will be hidden for security reasons. You can override this behavior
 with the configuration key `kumuluzee.graphql.exceptions.show-error-message`. The message will be replaced with
 `Server Error` and can be set using the configuration key `kumuluzee.graphql.exceptions.default-error-message`.
 By default, all messages from checked exceptions will be shown. You can hide messages from exceptions with the
@@ -209,6 +209,26 @@ kumuluzee:
       show-error-message:
         - com.example.exceptions.ShownRuntimeException
       default-error-message: Server error, for more information contact ustomer service.
+```
+
+#### `show-error-message` defaults
+
+To provide a more seamless integration with __kumuluzee-rest__, some exceptions are added to `show-error-message`
+list by default, namely:
+
+- com.kumuluz.ee.rest.exceptions.InvalidEntityFieldException
+- com.kumuluz.ee.rest.exceptions.InvalidFieldValueException
+- com.kumuluz.ee.rest.exceptions.NoGenericTypeException
+- com.kumuluz.ee.rest.exceptions.NoSuchEntityFieldException
+- com.kumuluz.ee.rest.exceptions.QueryFormatException
+
+To disable these defaults and handle everything manually use the following configuration:
+
+```yaml
+kumuluzee:
+  graphql:
+    exceptions:
+      include-show-error-defaults: false
 ```
 
 ## Querying GraphQL endpoint

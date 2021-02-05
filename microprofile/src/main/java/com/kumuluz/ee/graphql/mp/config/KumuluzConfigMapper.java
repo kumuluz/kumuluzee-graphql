@@ -40,6 +40,15 @@ public class KumuluzConfigMapper implements ConfigurationSource {
 
     private static final Map<String, String> CONFIG_MAP = new HashMap<>();
     private static final Map<String, String> CONFIG_MAP_LIST = new HashMap<>();
+    private static final String SHOW_ERROR_DEFAULTS_CONFIG_KEY =
+            "kumuluzee.graphql.exceptions.include-show-error-defaults";
+    private static final String[] SHOW_ERROR_DEFAULTS = new String[] {
+            "com.kumuluz.ee.rest.exceptions.InvalidEntityFieldException",
+            "com.kumuluz.ee.rest.exceptions.InvalidFieldValueException",
+            "com.kumuluz.ee.rest.exceptions.NoGenericTypeException",
+            "com.kumuluz.ee.rest.exceptions.NoSuchEntityFieldException",
+            "com.kumuluz.ee.rest.exceptions.QueryFormatException",
+    };
 
     static {
         CONFIG_MAP.put(ConfigKey.DEFAULT_ERROR_MESSAGE, "kumuluzee.graphql.exceptions.default-error-message");
@@ -81,7 +90,16 @@ public class KumuluzConfigMapper implements ConfigurationSource {
         mappedKey = CONFIG_MAP_LIST.get(s);
 
         if (mappedKey != null) {
-            return configurationUtil.getList(mappedKey).map(ls -> String.join(",", ls));
+            Optional<String> returnValue = configurationUtil.getList(mappedKey).map(ls -> String.join(",", ls));
+
+            if ("kumuluzee.graphql.exceptions.show-error-message".equals(mappedKey) &&
+                    configurationUtil.getBoolean(SHOW_ERROR_DEFAULTS_CONFIG_KEY).orElse(true)) {
+
+                String defaults = String.join(",", SHOW_ERROR_DEFAULTS);
+                returnValue = Optional.of(defaults + returnValue.map(v -> "," + v).orElse(""));
+            }
+
+            return returnValue;
         }
 
         return Optional.empty();
