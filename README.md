@@ -389,7 +389,7 @@ kumuluzee:
       enabled: true
 ```
 
-This will add a counter and a timer to every query and mutation in the application. For a more fine grained control
+This will add a counter and a timer to every query and mutation in the application. For a more fine-grained control
 over metrics you can always use metrics annotations on your query/mutation methods. For example:
 
 ```java
@@ -439,6 +439,51 @@ public class Customer {
     private String firstName;
 
     // ...
+}
+```
+
+## Integration with kumuluzee-rest
+
+You can use the standard [kumuluzee-rest](https://github.com/kumuluz/kumuluzee-rest) parameters (pagination/sort/filter)
+in GraphQL queries by using the `GraphQLUtils.queryParametersBuilder()` to construct `QueryParameters`
+which can then be used by _kumuluzee-rest_.
+
+For example:
+
+```java
+@Query
+public StudentConnection getStudentsConnection(Long limit, Long offset, String sort, String filter) {
+
+    QueryParameters qp = GraphQLUtils.queryParametersBuilder()
+            .withQueryStringDefaults(qsd)
+            .withLimit(limit)
+            .withOffset(offset)
+            .withOrder(sort)
+            .withFilter(filter)
+            .build();
+
+    return new StudentConnection(JPAUtils.queryEntities(em, Student.class, qp),
+        JPAUtils.queryEntitiesCount(em, Student.class, qp));
+}
+```
+
+Query:
+
+```graphql
+query StudentsStartingWithJ {
+  studentsConnection(
+    offset: "0"
+    limit: "10"
+    sort: "studentNumber"
+    filter: "name:LIKE:J%"
+  ) {
+    totalCount
+    edges {
+      studentNumber
+      name
+      surname
+    }
+  }
 }
 ```
 
