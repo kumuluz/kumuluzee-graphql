@@ -31,7 +31,7 @@ import com.kumuluz.ee.configuration.ConfigurationSource;
  * Registers {@link KumuluzConfigMapper} configuration extension.
  *
  * @author Urban Malc
- * @since 1.2.0
+ * @since 1.1.0
  */
 @EeExtensionDef(name = "GraphQLMP", group = EeExtensionGroup.CONFIG)
 public class GraphQLConfigExtension implements ConfigExtension {

@@ -43,7 +43,7 @@ import java.util.Set;
  * Collects classes annotated with {@link GraphQLApplicationClass} and writes them to a service file.
  *
  * @author Urban Malc
- * @since 1.2.0
+ * @since 1.1.0
  */
 public class AnnotationProcessor extends AbstractProcessor {
 

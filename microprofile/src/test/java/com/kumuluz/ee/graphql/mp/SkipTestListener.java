@@ -31,7 +31,7 @@ import java.util.Arrays;
  * Skips tests, which are disabled for various reasons.
  *
  * @author Urban Malc
- * @since 1.2.0
+ * @since 1.1.0
  */
 public class SkipTestListener implements IInvokedMethodListener {
 

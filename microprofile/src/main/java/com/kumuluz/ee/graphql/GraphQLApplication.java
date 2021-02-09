@@ -24,7 +24,7 @@ package com.kumuluz.ee.graphql;
  * GraphQL Application Class, used mainly for {@link javax.annotation.security.DeclareRoles} annotation.
  *
  * @author Urban Malc
- * @since 1.2.0
+ * @since 1.1.0
  */
 public class GraphQLApplication {
 }

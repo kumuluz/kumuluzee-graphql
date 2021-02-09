@@ -30,7 +30,7 @@ import java.util.ResourceBundle;
  * Adds required dependencies to deployments.
  *
  * @author Urban Malc
- * @since 1.2.0
+ * @since 1.1.0
  */
 public class DependencyAppender implements MavenDependencyAppender {
 

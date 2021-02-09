@@ -50,7 +50,7 @@ import java.util.logging.Logger;
  * Scans classpath for annotations and initializes schema.
  *
  * @author Urban Malc
- * @since 1.2.0
+ * @since 1.1.0
  */
 @ApplicationScoped
 public class GraphQLSchemaInitializer {

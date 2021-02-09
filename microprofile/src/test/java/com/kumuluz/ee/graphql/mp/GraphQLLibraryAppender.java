@@ -31,7 +31,7 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
  * Adds GraphQL library (this repo) to deployments.
  *
  * @author Urban Malc
- * @since 1.2.0
+ * @since 1.1.0
  */
 public class GraphQLLibraryAppender extends CachedAuxilliaryArchiveAppender {
 

@@ -27,7 +27,7 @@ import org.jboss.arquillian.core.spi.LoadableExtension;
  * Registers library appender with Arquillian.
  *
  * @author Urban Malc
- * @since 1.2.0
+ * @since 1.1.0
  */
 public class GraphQLArquillianExtension implements LoadableExtension {
 

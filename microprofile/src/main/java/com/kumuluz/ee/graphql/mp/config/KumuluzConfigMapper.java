@@ -34,7 +34,7 @@ import java.util.Optional;
  * Maps MicroProfile and SmallRye configuration key to KumuluzEE namespace.
  *
  * @author Urban Malc
- * @since 1.2.0
+ * @since 1.1.0
  */
 public class KumuluzConfigMapper implements ConfigurationSource {
 

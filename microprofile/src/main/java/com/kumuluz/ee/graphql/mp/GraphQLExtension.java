@@ -36,7 +36,7 @@ import java.util.logging.Logger;
  * KumuluzEE MicroProfile GraphQL extension, implemented by SmallRye.
  *
  * @author Urban Malc
- * @since 1.2.0
+ * @since 1.1.0
  */
 @EeExtensionDef(name = "MicroProfileGraphQL", group = EeExtensionGroup.GRAPHQL)
 @EeComponentDependencies({

@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * GraphQLConfiguration annotation - enables application class to be scanned for integration with kumuluzee-security.
  *
  * @author Urban Malc
- * @since 1.2.0
+ * @since 1.1.0
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
