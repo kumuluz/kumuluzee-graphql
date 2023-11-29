@@ -62,7 +62,7 @@ public class GraphQLExtension implements Extension {
     public void load() {
         List<GraphQLApplication> applications = new ArrayList<>();
         ServiceLoader.load(GraphQLApplication.class).forEach(applications::add);
-        if(applications.size() > 1) {
+        if (applications.size() > 1) {
             throw new KumuluzServerException("Found multiple declarations of GraphQLApplication. Please only provide one.");
         }
     }
@@ -77,11 +77,11 @@ public class GraphQLExtension implements Extension {
             try {
                 URI u = new URI(path);
 
-                if(u.isAbsolute()) {
+                if (u.isAbsolute()) {
                     LOG.severe("URL must be relative. Extension not initialized.");
                     return;
                 }
-            } catch(Exception E) {
+            } catch (Exception E) {
                 LOG.severe("Malformed url: " + path + ". Extension not initialized.");
                 return;
             }

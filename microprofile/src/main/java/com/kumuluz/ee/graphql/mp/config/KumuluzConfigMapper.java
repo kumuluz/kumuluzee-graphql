@@ -23,7 +23,7 @@ package com.kumuluz.ee.graphql.mp.config;
 import com.kumuluz.ee.configuration.ConfigurationSource;
 import com.kumuluz.ee.configuration.utils.ConfigurationDispatcher;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
-import io.smallrye.graphql.cdi.config.ConfigKey;
+import io.smallrye.graphql.config.ConfigKey;
 
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +42,7 @@ public class KumuluzConfigMapper implements ConfigurationSource {
     private static final Map<String, String> CONFIG_MAP_LIST = new HashMap<>();
     private static final String SHOW_ERROR_DEFAULTS_CONFIG_KEY =
             "kumuluzee.graphql.exceptions.include-show-error-defaults";
-    private static final String[] SHOW_ERROR_DEFAULTS = new String[] {
+    private static final String[] SHOW_ERROR_DEFAULTS = new String[]{
             "com.kumuluz.ee.rest.exceptions.InvalidEntityFieldException",
             "com.kumuluz.ee.rest.exceptions.InvalidFieldValueException",
             "com.kumuluz.ee.rest.exceptions.NoGenericTypeException",
@@ -57,7 +57,8 @@ public class KumuluzConfigMapper implements ConfigurationSource {
         CONFIG_MAP.put(ConfigKey.SCHEMA_INCLUDE_DIRECTIVES, "kumuluzee.graphql.schema.include-directives");
         CONFIG_MAP.put(ConfigKey.SCHEMA_INCLUDE_INTROSPECTION_TYPES, "kumuluzee.graphql.schema.include-introspection-types");
         CONFIG_MAP.put(ConfigKey.ENABLE_METRICS, "kumuluzee.graphql.metrics.enabled");
-        CONFIG_MAP.put(ConfigKey.ENABLE_VALIDATION, "kumuluzee.graphql.bean-validation.enabled");
+        // CONFIG_MAP.put(ConfigKey.ENABLE_VALIDATION, "kumuluzee.graphql.bean-validation.enabled");
+        CONFIG_MAP.put("smallrye.graphql.validation.enabled", "kumuluzee.graphql.bean-validation.enabled");
 
         CONFIG_MAP_LIST.put("mp.graphql.hideErrorMessage", "kumuluzee.graphql.exceptions.hide-error-message");
         CONFIG_MAP_LIST.put("mp.graphql.showErrorMessage", "kumuluzee.graphql.exceptions.show-error-message");

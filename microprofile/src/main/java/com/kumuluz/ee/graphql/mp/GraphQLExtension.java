@@ -26,8 +26,8 @@ import com.kumuluz.ee.common.dependencies.*;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.jetty.JettyServletServer;
-import io.smallrye.graphql.servlet.ExecutionServlet;
-import io.smallrye.graphql.servlet.SchemaServlet;
+import io.smallrye.graphql.entry.http.ExecutionServlet;
+import io.smallrye.graphql.entry.http.SchemaServlet;
 
 import java.net.URI;
 import java.util.logging.Logger;

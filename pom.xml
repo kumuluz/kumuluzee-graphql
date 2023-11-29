@@ -6,7 +6,7 @@
 
     <groupId>com.kumuluz.ee.graphql</groupId>
     <artifactId>kumuluzee-graphql-parent</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -27,35 +27,37 @@
     <url>https://ee.kumuluz.com</url>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- common -->
-        <kumuluzee.version>3.12.0</kumuluzee.version>
-        <jaxb-api.version>2.3.1</jaxb-api.version>
-        <kumuluzee-rest.version>1.4.0</kumuluzee-rest.version>
+        <kumuluzee.version>5.0.0-SNAPSHOT</kumuluzee.version>
+        <kumuluzee-rest.version>3.0.0-SNAPSHOT</kumuluzee-rest.version>
+
+        <jakarta-xml-bind-api.version>4.0.1</jakarta-xml-bind-api.version>
+        <jaxb-impl.version>4.0.4</jaxb-impl.version>
 
         <!-- legacy -->
-        <graphql-java-legacy.version>13.0</graphql-java-legacy.version>
-        <spqr.version>0.10.1</spqr.version>
+        <graphql-java-legacy.version>21.3</graphql-java-legacy.version>
+        <spqr.version>0.12.3</spqr.version>
 
         <!-- SmallRye (MP) -->
-        <graphql-java-smallrye.version>16.1</graphql-java-smallrye.version>
-        <microprofile-graphql.version>1.0.3</microprofile-graphql.version>
-        <smallrye-graphql.version>1.0.18</smallrye-graphql.version>
-        <kumuluzee-config-mp.version>1.4.1</kumuluzee-config-mp.version>
-        <classgraph.version>4.8.102</classgraph.version>
+        <graphql-java-smallrye.version>21.3</graphql-java-smallrye.version>
+        <microprofile-graphql.version>2.0</microprofile-graphql.version>
+        <smallrye-graphql.version>2.6.0</smallrye-graphql.version>
+        <kumuluzee-config-mp.version>3.0.0-SNAPSHOT</kumuluzee-config-mp.version>
+        <classgraph.version>4.8.165</classgraph.version>
 
-        <testng.version>6.14.3</testng.version>
-        <arquillian.version>1.6.0.Final</arquillian.version>
-        <kumuluzee-arquillian-container.version>1.1.1</kumuluzee-arquillian-container.version>
-        <rest-assured.version>3.3.0</rest-assured.version>
-        <surefire.plugin.version>2.22.2</surefire.plugin.version>
+        <testng.version>7.8.0</testng.version>
+        <arquillian.version>1.8.0.Final</arquillian.version>
+        <kumuluzee-arquillian-container.version>2.0.0-SNAPSHOT</kumuluzee-arquillian-container.version>
+        <rest-assured.version>5.3.2</rest-assured.version>
+        <surefire.plugin.version>3.2.2</surefire.plugin.version>
 
-        <nexus.staging.plugin.version>1.6.8</nexus.staging.plugin.version>
-        <gpg.plugin.version>1.6</gpg.plugin.version>
-        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <nexus.staging.plugin.version>1.6.13</nexus.staging.plugin.version>
+        <gpg.plugin.version>3.1.0</gpg.plugin.version>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
     </properties>
 
     <scm>
@@ -217,9 +219,15 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
-                    <version>${jaxb-api.version}</version>
+                    <groupId>jakarta.xml.bind</groupId>
+                    <artifactId>jakarta.xml.bind-api</artifactId>
+                    <version>${jakarta-xml-bind-api.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-impl</artifactId>
+                    <version>${jaxb-impl.version}</version>
+                    <scope>runtime</scope>
                 </dependency>
             </dependencies>
         </profile>

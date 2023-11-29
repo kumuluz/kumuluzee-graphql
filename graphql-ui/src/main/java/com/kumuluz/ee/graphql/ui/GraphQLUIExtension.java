@@ -77,7 +77,7 @@ public class GraphQLUIExtension implements Extension {
                 return;
             }
 
-            if(configurationUtil.getBoolean("kumuluzee.graphql.ui.enabled").orElse(true)) {
+            if (configurationUtil.getBoolean("kumuluzee.graphql.ui.enabled").orElse(true)) {
                 String mapping = configurationUtil.get("kumuluzee.graphql.ui.mapping").orElse("graphiql");
 
                 // strip "/"

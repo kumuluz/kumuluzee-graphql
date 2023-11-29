@@ -38,10 +38,11 @@ import graphql.execution.preparsed.PreparsedDocumentProvider;
 import graphql.schema.GraphQLSchema;
 import io.leangen.graphql.GraphQLSchemaGenerator;
 
-import javax.enterprise.inject.spi.CDI;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.enterprise.inject.spi.CDI;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -171,7 +172,7 @@ public class GraphQLServlet extends HttpServlet {
             configurationUtil.getList("kumuluzee.graphql.schema.base-packages")
                     .ifPresent(basePackages::addAll);
 
-            generator.withBasePackages(basePackages.toArray(new String [0]));
+            generator.withBasePackages(basePackages.toArray(new String[0]));
 
             for (Class<?> c : classes) {
                 if (CDIfound) {
